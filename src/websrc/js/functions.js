@@ -233,9 +233,9 @@ advanced:
 		case "z2m":
 			result = `# ${i18next.t('p.zi.cfg.ss')}
 serial:
-  adapter: zstack
 # ${i18next.t('p.zi.cfg.lxzg')}
   port: tcp://${ip}:${port}
+  adapter: zstack
   ${mist_cfg_txt}`;
 			break;
 		case "usb":
@@ -243,9 +243,9 @@ serial:
 # ${i18next.t('p.zi.cfg.lin')}
 # ${i18next.t('p.zi.cfg.ss')}
 serial:
-  adapter: zstack
 # ${i18next.t('p.zi.cfg.lxzg')}
   port: ${i18next.t('p.zi.cfg.dp')}
+  adapter: zstack
   ${mist_cfg_txt}`;
 			break;
 

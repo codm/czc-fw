@@ -462,6 +462,8 @@
   "cl": {
     "d": "Documentation",
     "g": "Github",
-    "c": "Contact"
+    "c": "Contact",
+    "m": "Mastodon",
+    "b": "Bluesky"
   }
 }
