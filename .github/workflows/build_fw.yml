@@ -23,7 +23,9 @@ jobs:
         shell: bash
         run: |
           value=${GITHUB_REF#refs/tags/}
+          clean_tag=${value:1}
           echo "tag=$value" >> $GITHUB_OUTPUT
+          echo "file_tag=$clean_tag" >> $GITHUB_OUTPUT
 
       - name: Display src/version.h before update
         run: cat src/version.h
@@ -103,8 +105,8 @@ jobs:
           name: "${{ steps.get_tag.outputs.tag }}"
           body: ${{ env.releaseMessage }}
           files: |
-            bin/czc_fw_${{ steps.get_tag.outputs.tag }}.ota.bin
-            bin/czc_fw_${{ steps.get_tag.outputs.tag }}.full.bin
+            bin/czc_fw_${{ steps.get_tag.outputs.file_tag }}.ota.bin
+            bin/czc_fw_${{ steps.get_tag.outputs.file_tag }}.full.bin
 
       - name: Checkout releases branch
         uses: actions/checkout@v3
