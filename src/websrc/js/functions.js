@@ -1063,7 +1063,7 @@ function toastConstructor(params, text) {
 	switch (params) {
 		case "espUpdAvail":
 			$("#toastHeaderText").text(i18next.t("ts.esp.upd.tt"));
-			$("#toastBody").text("ESP32 UPD text");
+			$("#toastBody").text("");
 			$('<button>', {
 				type: "button",
 				"class": "btn btn-warning",
