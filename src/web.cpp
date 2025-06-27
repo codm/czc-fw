@@ -1964,7 +1964,7 @@ String fetchLatestEspFw()
 {
     checkDNS();
     HTTPClient http;
-    http.begin("https://api.github.com/repos/codm/XZG/releases");
+    http.begin("https://api.github.com/repos/codm/czc-fw/releases");
     int httpCode = http.GET();
 
     String browser_download_url = "";
