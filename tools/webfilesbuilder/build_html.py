@@ -10,7 +10,6 @@ import sys
 NO_WEB_UPDATE = "tools/.no_web_update"
 
 sys.path.append("./tools")
-from func import print_logo
     
 def build_html():
     if not os.path.exists(NO_WEB_UPDATE):
@@ -30,7 +29,6 @@ def build_html():
 
         print("")
         print("Finish building WEB files")
-        print_logo()
 
 if not any(target in sys.argv for target in ["--clean", "erase"]):
     build_html()
