@@ -376,7 +376,7 @@
     "zi": {
       "cfg": {
         "alarm": "Parece que o CZC funciona em modo ponto de acesso (IP 192.168.1.1). \nO endereço IP mudará após a conexão com Ethernet ou Wi-Fi, após isso a configuração precisará ser gerada novamente.",
-        "dp": "INSERT_DEVICE_PATCH_HERE",
+        "dp": "INSERT_DEVICE_PATH_HERE",
         "dzl": "Desativar led Zigbee?",
         "ha": "Para Home Assistant: Vá para \"Configurações\"→\"Sistema\"→\"Hardware\"→Selecione o menu de 3 pontos no canto superior direito→\"Todo o Hardware\"→Role até ttyUSB e encontre seu adaptador→Copiar caminho do dispositivo como \"/dev/ \nttyUSB0\"",
         "lin": "Listar dispositivos USB no Linux: ls /dev/ttyUSB*",

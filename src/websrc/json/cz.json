@@ -157,7 +157,7 @@
         "sopm": "Nastavit výstupní výkon na max 20",
         "ha": "Pro Home Assistant: Přejděte na \"Nastavení\"→\"Systém\"→\"Hardware\"→V pravém horním rohu vyberte nabídku se třemi tečkami→\"Veškerý hardware\"→Přejděte na ttyUSB a najděte svůj adaptér→Kopírovat cestu zařízení jako \"/dev/ttyUSB0\"",
         "lin": "Seznam zařízení USB v systému Linux: ls /dev/ttyUSB*",
-        "dp": "INSERT_DEVICE_PATCH_HERE"
+        "dp": "INSERT_DEVICE_PATH_HERE"
       },
       "fws": {
         "tt": "Role zařízení",

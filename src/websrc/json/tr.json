@@ -376,7 +376,7 @@
     "zi": {
       "cfg": {
         "alarm": "Görünüşe göre CZC erişim noktası modunda çalışıyor (IP 192.168.1.1). \nEthernet veya Wi-Fi'ye bağlandıktan sonra IP adresi değişecektir, bundan sonra yapılandırmanın yeniden oluşturulması gerekir.",
-        "dp": "INSERT_DEVICE_PATCH_HERE",
+        "dp": "INSERT_DEVICE_PATH_HERE",
         "dzl": "Zigbee LED'i devre dışı bırakılsın mı?",
         "ha": "Ev Asistanı için: \"Ayarlar\" → \"Sistem\" → \"Donanım\" seçeneğine gidin → Sağ üst köşedeki 3 noktalı menüyü seçin → \"Tüm Donanım\" → ttyUSB'ye gidin ve adaptörünüzü bulun → \"/dev/ gibi Cihaz yolunu kopyalayın \nttyUSB0\"",
         "lin": "Linux'ta USB cihazlarını listeleyin: ls /dev/ttyUSB*",

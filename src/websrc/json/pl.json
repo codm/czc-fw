@@ -376,7 +376,7 @@
     "zi": {
       "cfg": {
         "alarm": "Wygląda na to, że CZC działa w trybie punktu dostępowego (IP 192.168.1.1). \nAdres IP zmieni się po podłączeniu do sieci Ethernet lub Wi-Fi, po czym należy ponownie wygenerować konfigurację.",
-        "dp": "INSERT_DEVICE_PATCH_HERE",
+        "dp": "INSERT_DEVICE_PATH_HERE",
         "dzl": "Wyłączyć diodę Zigbee?",
         "ha": "W przypadku Home Assistant: Przejdź do „Ustawienia” → „System” → „Sprzęt” → Wybierz menu z trzema kropkami w prawym górnym rogu → „Cały sprzęt” → Przewiń do ttyUSB i znajdź swój adapter → Skopiuj ścieżkę urządzenia, np. „/dev/ \nttyUSB0\"",
         "lin": "Lista urządzeń USB w systemie Linux: ls /dev/ttyUSB*",

@@ -20,16 +20,16 @@ jobs:
           GITHUB_REPO: ${{ github.repository }}
         run: |
           base_url="https://raw.githubusercontent.com/${GITHUB_REPO}/releases"
-          curl -s https://api.github.com/repos/xyzroe/XZG/releases | jq -r '
+          curl -s https://docs.codm.de/tools/releases.php | jq -r '
           .[] | 
-          {tag_name, url: .assets[] | select(.name | test("XZG_\\d{8}.full.bin")).browser_download_url} |
+          {tag_name, url: .assets[] | select(.name | test("czc_fw_\\d{8}.full.bin")).browser_download_url} |
           "\(.tag_name);\(.url)"
           ' | while IFS=';' read -r tag_name url; do
             file_name=$(basename "$url")
             mkdir -p "$tag_name"
             wget -O "$tag_name/$file_name" "$url"
             file_path="${base_url}/${tag_name}/${file_name}"
-            echo -e "{\n  \"name\": \"XZG Firmware\",\n  \"version\": \"$tag_name\",\n  \"builds\": [\n    {\n      \"chipFamily\": \"ESP32\",\n      \"improv\": false,\n      \"parts\": [\n        {\n          \"path\": \"$file_path\",\n          \"offset\": 0\n        }\n      ]\n    }\n  ]\n}" > "$tag_name/manifest.json"
+            echo -e "{\n  \"name\": \"CZC Firmware\",\n  \"version\": \"$tag_name\",\n  \"builds\": [\n    {\n      \"chipFamily\": \"ESP32\",\n      \"improv\": false,\n      \"parts\": [\n        {\n          \"path\": \"$file_path\",\n          \"offset\": 0\n        }\n      ]\n    }\n  ]\n}" > "$tag_name/manifest.json"
           done
 
       - name: Push changes

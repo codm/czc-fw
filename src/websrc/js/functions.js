@@ -235,6 +235,7 @@ advanced:
 serial:
 # ${i18next.t('p.zi.cfg.lxzg')}
   port: tcp://${ip}:${port}
+  adapter: zstack
   ${mist_cfg_txt}`;
 			break;
 		case "usb":
@@ -244,6 +245,7 @@ serial:
 serial:
 # ${i18next.t('p.zi.cfg.lxzg')}
   port: ${i18next.t('p.zi.cfg.dp')}
+  adapter: zstack
   ${mist_cfg_txt}`;
 			break;
 
@@ -1061,7 +1063,7 @@ function toastConstructor(params, text) {
 	switch (params) {
 		case "espUpdAvail":
 			$("#toastHeaderText").text(i18next.t("ts.esp.upd.tt"));
-			$("#toastBody").text("ESP32 UPD text");
+			$("#toastBody").text("");
 			$('<button>', {
 				type: "button",
 				"class": "btn btn-warning",
@@ -1240,7 +1242,9 @@ function connectEvents() {
 	sourceEvents.addEventListener('zb.nv', function (e) {
 		let currentContent = $("#console").val();
 		let newContent = currentContent + "\n" + e.data;
-		$("#console").val(newContent);
+		const $console = $("#console");
+		$console.val(newContent);
+		$console.scrollTop($console[0].scrollHeight)
 	}, false);
 
 	sourceEvents.addEventListener('zb.fi', function (e) {
@@ -2198,7 +2202,7 @@ function sub_zb(t) {
 }
 
 async function fetchReleaseData() {
-	var t = await fetch("https://api.github.com/repos/codm/XZG/releases");
+	var t = await fetch("https://docs.codm.de/tools/releases.php");
 	if (t.ok) return await t.json();
 	throw new Error("GitHub API request failed: " + t.statusText)
 }

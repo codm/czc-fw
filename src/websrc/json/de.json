@@ -382,7 +382,7 @@
     "zi": {
       "cfg": {
         "alarm": "Es scheint, dass CZC im Access Point-Modus (IP 192.168.1.1) funktioniert. \nDie IP-Adresse ändert sich nach der Verbindung mit Ethernet oder WLAN. Danach muss die Konfiguration erneut generiert werden.",
-        "dp": "INSERT_DEVICE_PATCH_HERE",
+        "dp": "INSERT_DEVICE_PATH_HERE",
         "dzl": "Zigbee-LED deaktivieren?",
         "ha": "Für Home Assistant: Gehen Sie zu „Einstellungen“ → „System“ → „Hardware“ → Wählen Sie das 3-Punkte-Menü in der oberen rechten Ecke → „Alle Hardware“ → Scrollen Sie zu ttyUSB und suchen Sie Ihren Adapter → Kopieren Sie den Gerätepfad wie „/dev/“ \nttyUSB0\"",
         "lin": "USB-Geräte unter Linux auflisten: ls /dev/ttyUSB*",
@@ -465,6 +465,8 @@
   "cl": {
     "d": "Dokumentation",
     "g": "Github",
-    "c": "Kontakt"
+    "c": "Kontakt",
+    "m": "Mastodon",
+    "b": "Bluesky"
   }
 }

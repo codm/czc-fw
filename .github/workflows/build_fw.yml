@@ -23,7 +23,9 @@ jobs:
         shell: bash
         run: |
           value=${GITHUB_REF#refs/tags/}
+          clean_tag=${value:1}
           echo "tag=$value" >> $GITHUB_OUTPUT
+          echo "file_tag=$clean_tag" >> $GITHUB_OUTPUT
 
       - name: Display src/version.h before update
         run: cat src/version.h
@@ -62,7 +64,6 @@ jobs:
         id: get_commit_message
         run: |
           currentTag=${{ steps.get_tag.outputs.tag }}
-          badgeText="![GitHub Downloads](https://img.shields.io/github/downloads/xyzroe/XZG/${currentTag}/total)"
           printf -v badgeTextWithNewlines "%s\n\n" "$badgeText" 
           commitMessage=$(git log -1 --pretty=%B | tail -n +2)
           fullCommitMessage="${badgeTextWithNewlines}${commitMessage}"
@@ -79,7 +80,7 @@ jobs:
         run: |
           cat << EOF > manifest.json
           {
-            "name": "XZG Firmware",
+            "name": "CZC Firmware",
             "version": "${{ steps.get_tag.outputs.tag }}",
             "builds": [
               {
@@ -87,7 +88,7 @@ jobs:
                 "improv": false,
                 "parts": [
                   {
-                    "path": "https://raw.githubusercontent.com/${{ github.repository }}/releases/${{ steps.get_tag.outputs.tag }}/XZG_${{ steps.get_tag.outputs.tag }}.full.bin",
+                    "path": "https://raw.githubusercontent.com/${{ github.repository }}/releases/${{ steps.get_tag.outputs.tag }}/czc_fw_${{ steps.get_tag.outputs.tag }}.full.bin",
                     "offset": 0
                   }
                 ]
@@ -104,8 +105,8 @@ jobs:
           name: "${{ steps.get_tag.outputs.tag }}"
           body: ${{ env.releaseMessage }}
           files: |
-            bin/XZG_${{ steps.get_tag.outputs.tag }}.ota.bin
-            bin/XZG_${{ steps.get_tag.outputs.tag }}.full.bin
+            bin/czc_fw_${{ steps.get_tag.outputs.file_tag }}.ota.bin
+            bin/czc_fw_${{ steps.get_tag.outputs.file_tag }}.full.bin
 
       - name: Checkout releases branch
         uses: actions/checkout@v3
@@ -114,10 +115,16 @@ jobs:
           path: releases
 
       - name: Copy files to releases directory
-        run: |
-          mkdir -p releases/${{ steps.get_tag.outputs.tag }}
-          cp ./bin/XZG_${{ steps.get_tag.outputs.tag }}.full.bin releases/${{ steps.get_tag.outputs.tag }}/
-          cp manifest.json releases/${{ steps.get_tag.outputs.tag }}/
+        run: | 
+          TAG=${{ steps.get_tag.outputs.tag }}
+          CLEAN_TAG=${TAG:1} 
+
+          echo "Listing bin directory:"
+          ls -la ./bin
+
+          mkdir -p releases/$TAG
+          cp ./bin/czc_fw_$CLEAN_TAG.full.bin releases/$TAG/
+          cp manifest.json releases/$TAG/
           echo "Files copied to releases directory."
 
       - name: Commit and push files to releases branch
@@ -132,21 +139,3 @@ jobs:
           else
             echo "No changes to commit"
           fi
-
-      - name: Send Telegram Notification about release
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          format: markdown
-          message: |
-            ${{ env.commitMessage }}
-
-            [${{ steps.get_tag.outputs.tag }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.get_tag.outputs.tag }})
-
-      - name: Send Discord Notification about release
-        run: |
-          json_payload=$(jq -n --arg content "https://github.com/${{ github.repository }}/releases/tag/${{ steps.get_tag.outputs.tag }}" '{content: $content}')
-          curl -H "Content-Type: application/json" \
-               -d "$json_payload" \
-               ${{ secrets.DISCORD_WEBHOOK }}
