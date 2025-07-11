@@ -909,7 +909,12 @@ void checkUpdateAvail()
     LOGD("%s %s", ESPkey, latestVersionEsp.c_str());
     LOGD("%s %s", ZBkey, latestVersionZb.c_str());
 
-    if (latestVersionEsp.length() > 0 && compareVersions(latestVersionEsp, VERSION) > 0)
+    String sVersion(VERSION);
+    LOGD("sVersion: %s", sVersion);
+    String subVersion = sVersion.substring(1);
+    LOGD("SubVer: %s", subVersion);
+
+    if (latestVersionEsp.length() > 0 && compareVersions(latestVersionEsp, subVersion) > 0)
     {
       vars.updateEspAvail = true;
       printLogMsg(String(FoundKey) + String(ESPkey) + String(NewFwKey) + latestVersionEsp);
