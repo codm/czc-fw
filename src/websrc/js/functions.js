@@ -2202,7 +2202,7 @@ function sub_zb(t) {
 }
 
 async function fetchReleaseData() {
-	var t = await fetch("https://api.github.com/repos/codmoh/czc-fw/releases");
+	var t = await fetch("https://docs.codm.de/tools/releases.php");
 	if (t.ok) return await t.json();
 	throw new Error("GitHub API request failed: " + t.statusText)
 }

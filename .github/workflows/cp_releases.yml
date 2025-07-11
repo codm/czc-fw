@@ -20,7 +20,7 @@ jobs:
           GITHUB_REPO: ${{ github.repository }}
         run: |
           base_url="https://raw.githubusercontent.com/${GITHUB_REPO}/releases"
-          curl -s https://api.github.com/repos/codmoh/czc-fw/releases | jq -r '
+          curl -s https://docs.codm.de/tools/releases.php | jq -r '
           .[] | 
           {tag_name, url: .assets[] | select(.name | test("czc_fw_\\d{8}.full.bin")).browser_download_url} |
           "\(.tag_name);\(.url)"
