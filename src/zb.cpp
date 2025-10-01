@@ -6,7 +6,6 @@
 #include <ETH.h>
 #include <HTTPClient.h>
 
-// #include <esp_task_wdt.h>
 #include <CCTools.h>
 
 #include "config.h"
@@ -275,24 +274,6 @@ void flashZbUrl(String url)
     }
 }
 
-/*void printBufferAsHex(const byte *buffer, size_t length)
-{
-    const char *TAG = "BufferHex";
-    char hexStr[CCTool.TRANSFER_SIZE + 10];
-    std::string hexOutput;
-
-    for (size_t i = 0; i < length; ++i)
-    {
-        if (buffer[i] != 255)
-        {
-            sprintf(hexStr, "%02X ", buffer[i]);
-            hexOutput += hexStr;
-        }
-    }
-
-    LOGD("Buffer content:\n%s", hexOutput.c_str());
-}*/
-
 bool eraseWriteZbUrl(const char *url, std::function<void(float)> progressShow, CCTools &CCTool)
 {
     HTTPClient http;
@@ -392,8 +373,82 @@ bool eraseWriteZbUrl(const char *url, std::function<void(float)> progressShow, C
     return isSuccess;
 }
 
-#include <FS.h>
-#include <LittleFS.h>
+// TODO:
+// File writing
+// File error handling
+// Do more, smaller functions
+// Fix stupid function parameters 
+const char* downloadFirmwareFromGithub(const char *url) {
+    HTTPClient http;
+    WiFiClientSecure secure_client;
+    secure_client.setInsecure();
+    http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+    
+    const char* zigbee_firmware_path = "/zigbee/firmware.bin";
+    DEBUG_PRINTLN("[HTTP] begin...");
+    http.begin(secure_client, url);
+
+    http.addHeader("Content-Type", "application/octet-stream");
+    http.addHeader("Connection", "close");    
+
+    int http_responce_code = http.GET();
+    DEBUG_PRINT("[HTTP] GET code: ");
+    DEBUG_PRINTLN(http_responce_code);
+    if(http_responce_code == HTTP_CODE_OK) {
+        int http_remaining_file_length = http.getSize();
+        DEBUG_PRINT("[HTTP] GET file length: ");
+        DEBUG_PRINTLN(http_remaining_file_length);
+
+        uint8_t http_read_buffer[128] = {0};
+
+        WiFiClient* http_read_stream = http.getStreamPtr();
+
+        DEBUG_PRINTLN("[LITTEFS] wipe filesystem, create and open Firmware file");
+        LittleFS.format();
+        LittleFS.mkdir("/zigbee");
+        LittleFS.open(zigbee_firmware_path, "w");
+        DEBUG_PRINTLN("[LITTLEFS] wipe and creation completed successfully");
+
+        File zigbee_firmware_file = LittleFS.open(zigbee_firmware_path, FILE_APPEND);
+            if(!zigbee_firmware_file) {
+                DEBUG_PRINTLN("[LITTLEFS] ERROR opening firmware file");
+                return nullptr;
+            }
+
+        DEBUG_PRINTLN("[HTTP] Start download...");
+        // download remaining file length OR continue chunked download (len = -1)
+        while(http.connected() && (http_remaining_file_length > 0 || http_remaining_file_length == -1)) {
+            size_t download_available_size = http_read_stream->available();
+
+            if(download_available_size > 0) {
+                int http_payload_size = http_read_stream->readBytes(
+                    http_read_buffer, 
+                    ((download_available_size > sizeof(http_read_buffer)) ? sizeof(http_read_buffer) : download_available_size)
+                );
+
+                //write payload to littleFS
+                //should be own function
+                if(!zigbee_firmware_file.write(http_read_buffer, http_payload_size)){
+                    DEBUG_PRINTLN("[LITTEFS] ERROR appending data to firmware file");
+                    zigbee_firmware_file.close();
+                    return nullptr;
+                }
+
+                if(http_remaining_file_length > 0)
+                    http_remaining_file_length -= http_payload_size;
+            }
+            delay(1); // yield to other applications
+        }
+        zigbee_firmware_file.close();
+        DEBUG_PRINTLN("[HTTP] Finished download");
+    }
+    else {
+        DEBUG_PRINT("[HTTP] GET failed, error: ");
+        DEBUG_PRINTLN(http.errorToString(http_responce_code).c_str());
+    }
+    http.end();
+    return zigbee_firmware_path;
+}
 
 bool eraseWriteZbFile(const char *filePath, std::function<void(float)> progressShow, CCTools &CCTool)
 {

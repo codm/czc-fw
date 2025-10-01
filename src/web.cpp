@@ -600,15 +600,25 @@ static void apiCmdLedAct(String &result)
 
 static void apiCmdZbFlash(String &result)
 {
+    auto noop = [](float percent) {
+        percent = 1.0;
+        return percent;
+    };
+
     if (serverWeb.hasArg(argUrl))
     {
-        flashZbUrl(serverWeb.arg(argUrl));
+        // flashZbUrl(serverWeb.arg(argUrl));
+        const char* zigbee_firmware_path = downloadFirmwareFromGithub(serverWeb.arg(argUrl).c_str());
+        eraseWriteZbFile(zigbee_firmware_path, noop ,CCTool);
     }
     else {
         String link = fetchLatestZbFw();
         if (link)
         {
-            flashZbUrl(link);
+            //flashZbUrl(link);
+            const char* zigbee_firmware_path = downloadFirmwareFromGithub(link.c_str());
+            eraseWriteZbFile(zigbee_firmware_path, noop ,CCTool);
+
         }
         else
         {
