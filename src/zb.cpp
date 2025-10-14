@@ -373,11 +373,6 @@ bool eraseWriteZbUrl(const char *url, std::function<void(float)> progressShow, C
     return isSuccess;
 }
 
-// TODO:
-// File writing
-// File error handling
-// Do more, smaller functions
-// Fix stupid function parameters 
 const char* downloadFirmwareFromGithub(const char *url) {
     HTTPClient http;
     WiFiClientSecure secure_client;
@@ -403,11 +398,15 @@ const char* downloadFirmwareFromGithub(const char *url) {
 
         WiFiClient* http_read_stream = http.getStreamPtr();
 
-        DEBUG_PRINTLN("[LITTEFS] wipe filesystem, create and open Firmware file");
-        LittleFS.format();
+        DEBUG_PRINTLN("[LITTEFS] check filesystem, create and open Firmware file");
+        if(!remainingLittleFsSpace()) {
+            DEBUG_PRINTLN("[LITTLEFS] ERROR: not enough space in FS, returning nullptr");
+            return nullptr;
+        }
+
         LittleFS.mkdir("/zigbee");
         LittleFS.open(zigbee_firmware_path, "w");
-        DEBUG_PRINTLN("[LITTLEFS] wipe and creation completed successfully");
+        DEBUG_PRINTLN("[LITTLEFS] file creation and checkout completed successfully");
 
         File zigbee_firmware_file = LittleFS.open(zigbee_firmware_path, FILE_APPEND);
             if(!zigbee_firmware_file) {
@@ -427,7 +426,6 @@ const char* downloadFirmwareFromGithub(const char *url) {
                 );
 
                 //write payload to littleFS
-                //should be own function
                 if(!zigbee_firmware_file.write(http_read_buffer, http_payload_size)){
                     DEBUG_PRINTLN("[LITTEFS] ERROR appending data to firmware file");
                     zigbee_firmware_file.close();
@@ -436,6 +434,8 @@ const char* downloadFirmwareFromGithub(const char *url) {
 
                 if(http_remaining_file_length > 0)
                     http_remaining_file_length -= http_payload_size;
+                DEBUG_PRINT("---- REM FILE SIZE: ");
+                DEBUG_PRINTLN(http_remaining_file_length);
             }
             delay(1); // yield to other applications
         }
@@ -448,6 +448,14 @@ const char* downloadFirmwareFromGithub(const char *url) {
     }
     http.end();
     return zigbee_firmware_path;
+}
+
+bool remainingLittleFsSpace() {
+    size_t firmwareSize = 710000;
+    size_t remainingBytes = LittleFS.totalBytes() - LittleFS.usedBytes();
+    if (remainingBytes > firmwareSize)
+        return true;
+    return false;
 }
 
 bool eraseWriteZbFile(const char *filePath, std::function<void(float)> progressShow, CCTools &CCTool)
@@ -490,4 +498,11 @@ bool eraseWriteZbFile(const char *filePath, std::function<void(float)> progressS
     file.close();
     CCTool.restart();
     return true;
+}
+
+bool removeFirmwareFromFS(const char *filePath) {
+    DEBUG_PRINTLN("[LITTLEFS] removing firmware file");
+    if(LittleFS.remove(filePath));
+        return true;
+    return false;
 }
