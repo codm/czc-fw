@@ -399,7 +399,7 @@ const char* downloadFirmwareFromGithub(const char *url) {
         WiFiClient* http_read_stream = http.getStreamPtr();
 
         DEBUG_PRINTLN("[LITTEFS] check filesystem, create and open Firmware file");
-        if(!remainingLittleFsSpace()) {
+        if(!hasEnoughLiffleFsSpaceLeft(725000)) {
             DEBUG_PRINTLN("[LITTLEFS] ERROR: not enough space in FS, returning nullptr");
             return nullptr;
         }
@@ -450,12 +450,9 @@ const char* downloadFirmwareFromGithub(const char *url) {
     return zigbee_firmware_path;
 }
 
-bool remainingLittleFsSpace() {
-    size_t firmwareSize = 710000;
+bool hasEnoughLiffleFsSpaceLeft(size_t firmwareSize) {
     size_t remainingBytes = LittleFS.totalBytes() - LittleFS.usedBytes();
-    if (remainingBytes > firmwareSize)
-        return true;
-    return false;
+    return remainingBytes > firmwareSize;
 }
 
 bool eraseWriteZbFile(const char *filePath, std::function<void(float)> progressShow, CCTools &CCTool)
@@ -500,9 +497,7 @@ bool eraseWriteZbFile(const char *filePath, std::function<void(float)> progressS
     return true;
 }
 
-bool removeFirmwareFromFS(const char *filePath) {
-    DEBUG_PRINTLN("[LITTLEFS] removing firmware file");
-    if(LittleFS.remove(filePath));
-        return true;
-    return false;
+bool removeFileFromFS(const char *filePath) {
+    DEBUG_PRINTLN("[LITTLEFS] removing file");
+    return LittleFS.remove(filePath);
 }
