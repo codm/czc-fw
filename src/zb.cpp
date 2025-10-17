@@ -398,7 +398,7 @@ const char* downloadFirmwareFromGithub(const char *url) {
 
         WiFiClient* http_read_stream = http.getStreamPtr();
 
-        DEBUG_PRINTLN("[LITTEFS] check filesystem, create and open Firmware file");
+        DEBUG_PRINTLN("[LITTLEFS] check filesystem, create and open Firmware file");
         if(!hasEnoughLiffleFsSpaceLeft(725000)) {
             DEBUG_PRINTLN("[LITTLEFS] ERROR: not enough space in FS, returning nullptr");
             return nullptr;
@@ -434,7 +434,7 @@ const char* downloadFirmwareFromGithub(const char *url) {
 
                 if(http_remaining_file_length > 0)
                     http_remaining_file_length -= http_payload_size;
-                DEBUG_PRINT("---- REM FILE SIZE: ");
+                DEBUG_PRINT("---- REMAINING FILE SIZE: ");
                 DEBUG_PRINTLN(http_remaining_file_length);
             }
             delay(1); // yield to other applications
@@ -468,6 +468,7 @@ bool eraseWriteZbFile(const char *filePath, std::function<void(float)> progressS
 
     CCTool.eraseFlash();
     printLogMsg("Erase completed!");
+    DEBUG_PRINTLN("[FLASH] Erase completed!");
 
     int totalSize = file.size();
 
@@ -480,6 +481,7 @@ bool eraseWriteZbFile(const char *filePath, std::function<void(float)> progressS
     byte buffer[CCTool.TRANSFER_SIZE];
     int loadedSize = 0;
 
+    DEBUG_PRINTLN("[FLASH] Begin flash process...");
     while (file.available() && loadedSize < totalSize)
     {
         size_t size = file.available();
@@ -489,9 +491,12 @@ bool eraseWriteZbFile(const char *filePath, std::function<void(float)> progressS
         loadedSize += c;
         float percent = static_cast<float>(loadedSize) / totalSize * 100.0f;
         progressShow(percent);
+        DEBUG_PRINT("[FLASH] in progess: ");
+        DEBUG_PRINTLN(percent);
         delay(1); // Yield to allow other processes
     }
-
+    
+    DEBUG_PRINTLN("[FLASH] Completed!");
     file.close();
     CCTool.restart();
     return true;

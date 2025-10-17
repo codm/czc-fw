@@ -607,7 +607,8 @@ static void apiCmdZbFlash(String &result)
 
     if (serverWeb.hasArg(argUrl))
     {
-        // flashZbUrl(serverWeb.arg(argUrl));
+        // Remove first if the previous firmware download had an error and the file was not deleted
+        removeFileFromFS("/zigbee/firmware.bin");
         const char* zigbee_firmware_path = downloadFirmwareFromGithub(serverWeb.arg(argUrl).c_str());
         eraseWriteZbFile(zigbee_firmware_path, noop ,CCTool);
         removeFileFromFS(zigbee_firmware_path);
@@ -616,7 +617,7 @@ static void apiCmdZbFlash(String &result)
         String link = fetchLatestZbFw();
         if (link)
         {
-            //flashZbUrl(link);
+            removeFileFromFS("/zigbee/firmware.bin");
             const char* zigbee_firmware_path = downloadFirmwareFromGithub(link.c_str());
             eraseWriteZbFile(zigbee_firmware_path, noop ,CCTool);
             removeFileFromFS(zigbee_firmware_path);
