@@ -104,7 +104,8 @@
         "f": "Wird geflasht: {{file}}",
         "fn": "Erfolgreich geflasht!",
         "nv": "Neue Version: {{ver}}",
-        "st": "CC2652-flash startet...",
+        "st": "CC2652-Download startet...",
+        "stf": "CC2652-Flash startet...",
         "er": "Löschen beendet"
       }
     }

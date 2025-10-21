@@ -7,6 +7,7 @@ void zbEraseNV(void *pvParameters);
 void flashZbUrl(String url);
 bool eraseWriteZbUrl(const char *url, std::function<void(float)> progressShow, CCTools &CCTool);
 const char* downloadFirmwareFromGithub(const char *url);
-bool hasEnoughLiffleFsSpaceLeft(size_t firmwareSize);
+bool hasEnoughLittleFsSpaceLeft(size_t firmwareSize);
 bool eraseWriteZbFile(const char *filePath, std::function<void(float)> progressShow, CCTools &CCTool);
 bool removeFileFromFS(const char *filePath);
+float sendPercentageToFrontend(float percent, float previousPercent, const char* eventType);

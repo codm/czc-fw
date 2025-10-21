@@ -1250,16 +1250,20 @@ function connectEvents() {
 	sourceEvents.addEventListener('zb.fi', function (e) {
 		let data = e.data.replaceAll("`", "<br>");
 
-		if (e.data == "start") {
+		if (e.data == "startDownload") {
 			$("#zbFlshPrgs").removeClass("progress-bar-animated");
 			data = i18next.t('md.zg.fu.st');
+		}
+
+		if (e.data == "startFlash") {
+			data = i18next.t('md.zg.fu.stf');
 		}
 
 		if (e.data == "erase") {
 			data = i18next.t('md.zg.fu.er');
 		}
 
-		if (e.data == "finish") {
+		if (e.data == "finishFlash") {
 			data = i18next.t('md.zg.fu.fn');
 			$(".progress").addClass(classHide);
 			$(modalBody).css("color", "green");

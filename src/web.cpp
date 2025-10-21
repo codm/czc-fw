@@ -600,6 +600,8 @@ static void apiCmdLedAct(String &result)
 
 static void apiCmdZbFlash(String &result)
 {
+    const char* zigbee_firmware_path = "/zigbee/firmware.bin";
+
     auto noop = [](float percent) {
         percent = 1.0;
         return percent;
@@ -608,19 +610,23 @@ static void apiCmdZbFlash(String &result)
     if (serverWeb.hasArg(argUrl))
     {
         // Remove first if the previous firmware download had an error and the file was not deleted
-        removeFileFromFS("/zigbee/firmware.bin");
-        const char* zigbee_firmware_path = downloadFirmwareFromGithub(serverWeb.arg(argUrl).c_str());
-        eraseWriteZbFile(zigbee_firmware_path, noop ,CCTool);
         removeFileFromFS(zigbee_firmware_path);
+        const char* zigbee_firmware_path = downloadFirmwareFromGithub(serverWeb.arg(argUrl).c_str());
+        if(zigbee_firmware_path != nullptr) {
+            eraseWriteZbFile(zigbee_firmware_path, noop ,CCTool);
+            removeFileFromFS(zigbee_firmware_path);
+        }
     }
     else {
         String link = fetchLatestZbFw();
         if (link)
         {
-            removeFileFromFS("/zigbee/firmware.bin");
-            const char* zigbee_firmware_path = downloadFirmwareFromGithub(link.c_str());
-            eraseWriteZbFile(zigbee_firmware_path, noop ,CCTool);
             removeFileFromFS(zigbee_firmware_path);
+            const char* zigbee_firmware_path = downloadFirmwareFromGithub(link.c_str());
+            if(zigbee_firmware_path != nullptr) {
+                eraseWriteZbFile(zigbee_firmware_path, noop ,CCTool);
+                removeFileFromFS(zigbee_firmware_path);
+            }
         }
         else
         {

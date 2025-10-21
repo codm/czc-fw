@@ -374,6 +374,9 @@ bool eraseWriteZbUrl(const char *url, std::function<void(float)> progressShow, C
 }
 
 const char* downloadFirmwareFromGithub(const char *url) {
+    const uint8_t eventLen = 11;
+    sendEvent(tagZB_FW_info, eventLen, String("startDownload"));
+
     HTTPClient http;
     WiFiClientSecure secure_client;
     secure_client.setInsecure();
@@ -391,6 +394,7 @@ const char* downloadFirmwareFromGithub(const char *url) {
     DEBUG_PRINTLN(http_responce_code);
     if(http_responce_code == HTTP_CODE_OK) {
         int http_remaining_file_length = http.getSize();
+        int http_total_file_length = http_remaining_file_length;
         DEBUG_PRINT("[HTTP] GET file length: ");
         DEBUG_PRINTLN(http_remaining_file_length);
 
@@ -399,7 +403,7 @@ const char* downloadFirmwareFromGithub(const char *url) {
         WiFiClient* http_read_stream = http.getStreamPtr();
 
         DEBUG_PRINTLN("[LITTLEFS] check filesystem, create and open Firmware file");
-        if(!hasEnoughLiffleFsSpaceLeft(725000)) {
+        if(!hasEnoughLittleFsSpaceLeft(725000)) {
             DEBUG_PRINTLN("[LITTLEFS] ERROR: not enough space in FS, returning nullptr");
             return nullptr;
         }
@@ -409,12 +413,13 @@ const char* downloadFirmwareFromGithub(const char *url) {
         DEBUG_PRINTLN("[LITTLEFS] file creation and checkout completed successfully");
 
         File zigbee_firmware_file = LittleFS.open(zigbee_firmware_path, FILE_APPEND);
-            if(!zigbee_firmware_file) {
-                DEBUG_PRINTLN("[LITTLEFS] ERROR opening firmware file");
-                return nullptr;
-            }
+        if(!zigbee_firmware_file) {
+            DEBUG_PRINTLN("[LITTLEFS] ERROR opening firmware file");
+            return nullptr;
+        }
 
         DEBUG_PRINTLN("[HTTP] Start download...");
+        float previousPercent = 0;
         // download remaining file length OR continue chunked download (len = -1)
         while(http.connected() && (http_remaining_file_length > 0 || http_remaining_file_length == -1)) {
             size_t download_available_size = http_read_stream->available();
@@ -427,8 +432,7 @@ const char* downloadFirmwareFromGithub(const char *url) {
 
                 //write payload to littleFS
                 if(!zigbee_firmware_file.write(http_read_buffer, http_payload_size)){
-                    DEBUG_PRINTLN("[LITTEFS] ERROR appending data to firmware file");
-                    zigbee_firmware_file.close();
+                    DEBUG_PRINTLN("[LITTLEFS] ERROR appending data to firmware file");
                     return nullptr;
                 }
 
@@ -437,6 +441,10 @@ const char* downloadFirmwareFromGithub(const char *url) {
                 DEBUG_PRINT("---- REMAINING FILE SIZE: ");
                 DEBUG_PRINTLN(http_remaining_file_length);
             }
+
+            float percent = ((float)http_total_file_length - http_remaining_file_length) / http_total_file_length * 100.0f;  
+            previousPercent = sendPercentageToFrontend(percent, previousPercent, tagZB_FW_prgs);
+
             delay(1); // yield to other applications
         }
         zigbee_firmware_file.close();
@@ -450,13 +458,16 @@ const char* downloadFirmwareFromGithub(const char *url) {
     return zigbee_firmware_path;
 }
 
-bool hasEnoughLiffleFsSpaceLeft(size_t firmwareSize) {
+bool hasEnoughLittleFsSpaceLeft(size_t firmwareSize) {
     size_t remainingBytes = LittleFS.totalBytes() - LittleFS.usedBytes();
     return remainingBytes > firmwareSize;
 }
 
 bool eraseWriteZbFile(const char *filePath, std::function<void(float)> progressShow, CCTools &CCTool)
 {
+    const uint8_t eventLen = 11;
+    sendEvent(tagZB_FW_info, eventLen, String("startFlash"));
+    
     File file = LittleFS.open(filePath, "r");
     if (!file)
     {
@@ -482,15 +493,15 @@ bool eraseWriteZbFile(const char *filePath, std::function<void(float)> progressS
     int loadedSize = 0;
 
     DEBUG_PRINTLN("[FLASH] Begin flash process...");
+    float previousPercent = 0;
     while (file.available() && loadedSize < totalSize)
     {
         size_t size = file.available();
         int c = file.readBytes(reinterpret_cast<char *>(buffer), std::min(size, sizeof(buffer)));
-        // printBufferAsHex(buffer, c);
         CCTool.processFlash(buffer, c);
         loadedSize += c;
         float percent = static_cast<float>(loadedSize) / totalSize * 100.0f;
-        progressShow(percent);
+        previousPercent = sendPercentageToFrontend(percent, previousPercent, tagZB_FW_prgs);
         DEBUG_PRINT("[FLASH] in progess: ");
         DEBUG_PRINTLN(percent);
         delay(1); // Yield to allow other processes
@@ -498,6 +509,9 @@ bool eraseWriteZbFile(const char *filePath, std::function<void(float)> progressS
     
     DEBUG_PRINTLN("[FLASH] Completed!");
     file.close();
+
+    sendEvent(tagZB_FW_info, eventLen, String("finishFlash"));
+
     CCTool.restart();
     return true;
 }
@@ -505,4 +519,14 @@ bool eraseWriteZbFile(const char *filePath, std::function<void(float)> progressS
 bool removeFileFromFS(const char *filePath) {
     DEBUG_PRINTLN("[LITTLEFS] removing file");
     return LittleFS.remove(filePath);
+}
+
+float sendPercentageToFrontend(float percent, float previousPercent, const char* eventType) {
+    const uint8_t eventLen = 11;
+
+    if ((percent - previousPercent) > 1 || percent < 0.1 || percent == 100) {
+        sendEvent(eventType, eventLen, String(percent));    
+        return percent;
+    }
+    return previousPercent;
 }
