@@ -54,6 +54,7 @@
         "scc": "Socket",
         "sccn": "No connection",
         "sccy": "{{count}} clients",
+        "fwer": "Faulty firmware installation",
         "su": "Connection time",
         "zfs": "Flash size",
         "zie": "IEEE"

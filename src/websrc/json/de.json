@@ -295,6 +295,7 @@
         "opu": "Zigbee-USB",
         "scc": "Socket-Client verbunden",
         "sccn": "Keine Verbindung",
+        "fwer": "Fehlerhafte Firmware-Installation",
         "su": "Verbindungszeit",
         "sccy": "Ja, {{count}} Client",
         "zie": "IEEE",
