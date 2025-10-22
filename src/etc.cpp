@@ -936,7 +936,9 @@ void checkUpdateAvail()
       if (systemCfg.updAutoInst)
       {
         printLogMsg(String(TryKey));
-        flashZbUrl(latestReleaseUrlZb);
+        const char* zigbee_firmware_path= "/zigbee/firmware.bin";
+        if(!flashZigbeefromURL(latestReleaseUrlZb.c_str(), zigbee_firmware_path, CCTool));
+          DEBUG_PRINTLN("[ETC, AUTO UPDATE] Error while downloading and flashing Zigbee firmware from link");
         ESP.restart();
       }
     }

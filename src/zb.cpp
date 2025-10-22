@@ -136,241 +136,21 @@ void zbEraseNV(void *pvParameters)
     vTaskDelete(NULL);
 }
 
-void flashZbUrl(String url)
-{
-    // zbFwCheck();
-    ledControl.modeLED.mode = LED_BLINK_3Hz;
-    vars.zbFlashing = true;
-
-    checkDNS();
-    delay(250);
-
-    Serial2.updateBaudRate(500000);
-    float last_percent = 0;
-
+bool flashZigbeefromURL(const char *url, const char *zigbee_firmware_path, CCTools &CCTool) {
     const uint8_t eventLen = 11;
 
-    auto progressShow = [last_percent](float percent) mutable
-    {
-        if ((percent - last_percent) > 1 || percent < 0.1 || percent == 100)
-        {
-            // char buffer[100];
-            // snprintf(buffer, sizeof(buffer), "Flash progress: %.2f%%", percent);
-            // printLogMsg(String(buffer));
-            LOGI("%.2f%%", percent);
-            sendEvent(tagZB_FW_prgs, eventLen, String(percent));
-            last_percent = percent;
-        }
-    };
-
-    printLogMsg("Start Zigbee flashing");
-    sendEvent(tagZB_FW_info, eventLen, String("start"));
-
-    // https://raw.githubusercontent.com/xyzroe/XZG/zb_fws/ti/coordinator/CC1352P7_coordinator_20240316.bin
-    //  CCTool.enterBSL();
-    int key = url.indexOf("?b=");
-
-    String clear_url = url.substring(0, key);
-
-    // printLogMsg("Clear from " + clear_url);
-    String baud_str = url.substring(key + 3, url.length());
-    // printLogMsg("Baud " + baud_str);
-    systemCfg.serialSpeed = baud_str.toInt();
-
-    printLogMsg("ZB flash " + clear_url + " @ " + systemCfg.serialSpeed);
-
-    sendEvent(tagZB_FW_file, eventLen, String(clear_url));
-
-    if (eraseWriteZbUrl(clear_url.c_str(), progressShow, CCTool))
-    {
-        sendEvent(tagZB_FW_info, eventLen, String("finish"));
-        printLogMsg("Flashed successfully");
-        Serial2.updateBaudRate(systemCfg.serialSpeed);
-
-        int lineIndex = clear_url.lastIndexOf("_");
-        int binIndex = clear_url.lastIndexOf(".bin");
-        int lastSlashIndex = clear_url.lastIndexOf("/");
-
-        if (lineIndex > -1 && binIndex > -1 && lastSlashIndex > -1)
-        {
-            String zbFw = clear_url.substring(lineIndex + 1, binIndex);
-            // LOGI("1 %s", zbFw);
-
-            strncpy(systemCfg.zbFw, zbFw.c_str(), sizeof(systemCfg.zbFw) - 1);
-            zbFw = "";
-
-            int i = 0;
-
-            int preLastSlash = -1;
-            // LOGI("2 %s", String(url.c_str()));
-
-            while (clear_url.indexOf("/", i) > -1 && i < lastSlashIndex)
-            {
-                int result = clear_url.indexOf("/", i);
-                // LOGI("r %d", result);
-                if (result > -1)
-                {
-                    i = result + 1;
-                    if (result < lastSlashIndex)
-                    {
-                        preLastSlash = result;
-                        // LOGI("pl %d", preLastSlash);
-                    }
-                }
-                // LOGI("l %d", lastSlashIndex);
-                // delay(500);
-            }
-
-            // LOGD("%s %s", String(preLastSlash), String(lastSlashIndex));
-            String zbRole = clear_url.substring(preLastSlash + 1, lastSlashIndex);
-            LOGI("%s", zbRole);
-
-            if (zbRole.indexOf("coordinator") > -1)
-            {
-                systemCfg.zbRole = COORDINATOR;
-            }
-            else if (zbRole.indexOf("router") > -1)
-            {
-                systemCfg.zbRole = ROUTER;
-            }
-            else if (zbRole.indexOf("tread") > -1)
-            {
-                systemCfg.zbRole = OPENTHREAD;
-            }
-            else
-            {
-                systemCfg.zbRole = UNDEFINED;
-            }
-            zbRole = "";
-
-            saveSystemConfig(systemCfg);
-        }
-        else
-        {
-            LOGW("URL error");
-        }
-        if (systemCfg.zbRole == COORDINATOR)
-        {
-            zbFwCheck();
-            zbLedToggle();
-            delay(1000);
-            zbLedToggle();
-        }
-        sendEvent(tagZB_FW_file, eventLen, String(systemCfg.zbFw));
-        delay(500);
-        ESP.restart();
+    // Remove first if the previous firmware download had an error and the file was not deleted
+    removeFileFromFS(zigbee_firmware_path);
+    zigbee_firmware_path = downloadFirmwareFromGithub(url);
+    if(zigbee_firmware_path != nullptr) {
+        eraseWriteZbFile(zigbee_firmware_path,CCTool);
+        removeFileFromFS(zigbee_firmware_path);
     }
-    else
-    {
-        Serial2.updateBaudRate(systemCfg.serialSpeed);
-        printLogMsg("Failed to flash Zigbee");
+    else {
         sendEvent(tagZB_FW_err, eventLen, String("Failed!"));
+        return false;
     }
-    ledControl.modeLED.mode = LED_OFF;
-    vars.zbFlashing = false;
-    if (mqttCfg.enable && !vars.mqttConn)
-    {
-        connectToMqtt();
-    }
-}
-
-bool eraseWriteZbUrl(const char *url, std::function<void(float)> progressShow, CCTools &CCTool)
-{
-    HTTPClient http;
-    WiFiClientSecure client;
-    client.setInsecure();
-    http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
-
-    int loadedSize = 0;
-    int totalSize = 0;
-    int maxRetries = 7;
-    int retryCount = 0;
-    int retryDelay = 500;
-    bool isSuccess = false;
-
-    while (retryCount < maxRetries && !isSuccess)
-    {
-        if (loadedSize == 0)
-        {
-            CCTool.eraseFlash();
-            sendEvent("ZB_FW_info", 11, String("erase"));
-            printLogMsg("Erase completed!");
-        }
-
-        http.begin(client, url);
-        http.addHeader("Content-Type", "application/octet-stream");
-
-        if (loadedSize > 0)
-        {
-            http.addHeader("Range", "bytes=" + String(loadedSize) + "-");
-        }
-
-        int httpCode = http.GET();
-
-        if (httpCode != HTTP_CODE_OK && httpCode != HTTP_CODE_PARTIAL_CONTENT)
-        {
-            char buffer[100];
-            snprintf(buffer, sizeof(buffer), "Failed to download file, HTTP code: %d\n", httpCode);
-            printLogMsg(buffer);
-
-            http.end();
-            retryCount++;
-            delay(retryDelay);
-            continue;
-        }
-
-        if (totalSize == 0)
-        {
-            totalSize = http.getSize();
-        }
-
-        if (loadedSize == 0)
-        {
-            if (!CCTool.beginFlash(BEGIN_ZB_ADDR, totalSize))
-            {
-                http.end();
-                printLogMsg("Error initializing flash process");
-                continue;
-            }
-            printLogMsg("Begin flash");
-        }
-
-        byte buffer[CCTool.TRANSFER_SIZE];
-        WiFiClient *stream = http.getStreamPtr();
-
-        while (http.connected() && loadedSize < totalSize)
-        {
-            size_t size = stream->available();
-            if (size > 0)
-            {
-                int c = stream->readBytes(buffer, std::min(size, sizeof(buffer)));
-                if (!CCTool.processFlash(buffer, c))
-                {
-                    loadedSize = 0;
-                    retryCount++;
-                    delay(retryDelay);
-                    break;
-                }
-                loadedSize += c;
-                float percent = static_cast<float>(loadedSize) / totalSize * 100.0f;
-                progressShow(percent);
-            }
-            else
-            {
-                delay(1); // Yield to the WiFi stack
-            }
-        }
-
-        http.end();
-
-        if (loadedSize >= totalSize)
-        {
-            isSuccess = true;
-        }
-    }
-
-    CCTool.restart();
-    return isSuccess;
+    return true;
 }
 
 const char* downloadFirmwareFromGithub(const char *url) {
@@ -443,7 +223,7 @@ const char* downloadFirmwareFromGithub(const char *url) {
             }
 
             float percent = ((float)http_total_file_length - http_remaining_file_length) / http_total_file_length * 100.0f;  
-            previousPercent = sendPercentageToFrontend(percent, previousPercent, tagZB_FW_DW_prgs);
+            previousPercent = sendPercentageToFrontend(percent, previousPercent, tagZB_FW_prgs);
 
             delay(1); // yield to other applications
         }
@@ -458,12 +238,7 @@ const char* downloadFirmwareFromGithub(const char *url) {
     return zigbee_firmware_path;
 }
 
-bool hasEnoughLittleFsSpaceLeft(size_t firmwareSize) {
-    size_t remainingBytes = LittleFS.totalBytes() - LittleFS.usedBytes();
-    return remainingBytes > firmwareSize;
-}
-
-bool eraseWriteZbFile(const char *filePath, std::function<void(float)> progressShow, CCTools &CCTool)
+bool eraseWriteZbFile(const char *filePath, CCTools &CCTool)
 {
     const uint8_t eventLen = 11;
     sendEvent(tagZB_FW_info, eventLen, String("startFlash"));
@@ -516,11 +291,6 @@ bool eraseWriteZbFile(const char *filePath, std::function<void(float)> progressS
     return true;
 }
 
-bool removeFileFromFS(const char *filePath) {
-    DEBUG_PRINTLN("[LITTLEFS] removing file");
-    return LittleFS.remove(filePath);
-}
-
 float sendPercentageToFrontend(float percent, float previousPercent, const char* eventType) {
     const uint8_t eventLen = 11;
 
@@ -529,4 +299,14 @@ float sendPercentageToFrontend(float percent, float previousPercent, const char*
         return percent;
     }
     return previousPercent;
+}
+
+bool hasEnoughLittleFsSpaceLeft(size_t firmwareSize) {
+    size_t remainingBytes = LittleFS.totalBytes() - LittleFS.usedBytes();
+    return remainingBytes > firmwareSize;
+}
+
+bool removeFileFromFS(const char *filePath) {
+    DEBUG_PRINTLN("[LITTLEFS] removing file");
+    return LittleFS.remove(filePath);
 }

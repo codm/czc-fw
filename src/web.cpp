@@ -610,30 +610,15 @@ static void apiCmdZbFlash(String &result)
 
     if (serverWeb.hasArg(argUrl))
     {
-        // Remove first if the previous firmware download had an error and the file was not deleted
-        removeFileFromFS(zigbee_firmware_path);
-        const char* zigbee_firmware_path = downloadFirmwareFromGithub(serverWeb.arg(argUrl).c_str());
-        if(zigbee_firmware_path != nullptr) {
-            eraseWriteZbFile(zigbee_firmware_path, noop ,CCTool);
-            removeFileFromFS(zigbee_firmware_path);
-        }
-        else {
-            sendEvent(tagZB_FW_err, eventLen, String("Failed!"));
-        }
+        if(!flashZigbeefromURL(serverWeb.arg(argUrl).c_str(), zigbee_firmware_path, CCTool));
+            DEBUG_PRINTLN("[WEB] Error while downloading and flashing Zigbee firmware");
     }
     else {
         String link = fetchLatestZbFw();
         if (link)
         {
-            removeFileFromFS(zigbee_firmware_path);
-            const char* zigbee_firmware_path = downloadFirmwareFromGithub(link.c_str());
-            if(zigbee_firmware_path != nullptr) {
-                eraseWriteZbFile(zigbee_firmware_path, noop ,CCTool);
-                removeFileFromFS(zigbee_firmware_path);
-            }
-            else {
-                sendEvent(tagZB_FW_err, eventLen, String("Failed!"));
-            }
+            if(!flashZigbeefromURL(link.c_str(), zigbee_firmware_path, CCTool));
+                DEBUG_PRINTLN("[WEB] Error while downloading and flashing Zigbee firmware from link");
         }
         else
         {
