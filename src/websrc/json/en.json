@@ -386,6 +386,8 @@
         "vgds": "Downloading release {{ver}} from GitHub...",
         "ucr": "Update complete! Rebooting!",
         "prgs": "Update: {{per}}%",
+        "dwnl": "Downloading firmware: {{per}} %",
+        "flsh": "Updating firmware: {{per}} %",
         "gvt": "GitHub releases"
       },
       "ws": {

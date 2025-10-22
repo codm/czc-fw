@@ -1234,8 +1234,13 @@ function connectEvents() {
 		}
 	});
 
+	sourceEvents.addEventListener('zb.dw', function (e) {
+		$('#zbFlshPgsTxt').html(i18next.t('md.esp.fu.dwnl', { per: e.data }));
+		$("#zbFlshPrgs").css("width", e.data + '%');
+	}, false);
+
 	sourceEvents.addEventListener('zb.fp', function (e) {
-		$('#zbFlshPgsTxt').html(i18next.t('md.esp.fu.prgs', { per: e.data }));
+		$('#zbFlshPgsTxt').html(i18next.t('md.esp.fu.flsh', { per: e.data }));
 		$("#zbFlshPrgs").css("width", e.data + '%');
 	}, false);
 

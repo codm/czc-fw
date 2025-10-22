@@ -443,7 +443,7 @@ const char* downloadFirmwareFromGithub(const char *url) {
             }
 
             float percent = ((float)http_total_file_length - http_remaining_file_length) / http_total_file_length * 100.0f;  
-            previousPercent = sendPercentageToFrontend(percent, previousPercent, tagZB_FW_prgs);
+            previousPercent = sendPercentageToFrontend(percent, previousPercent, tagZB_FW_DW_prgs);
 
             delay(1); // yield to other applications
         }

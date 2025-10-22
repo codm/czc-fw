@@ -50,6 +50,8 @@
         "lfm": "Aktualisierung von lokaler Datei.",
         "lgds": "Laden Sie die neueste GitHub-Version herunter...",
         "prgs": "Aktualisierung: {{per}} %",
+        "dwnl": "Lade Firmware herunter: {{per}} %",
+        "flsh": "Aktualisiere Firmware: {{per}} %",
         "tt": "CZC-Firmware-Update",
         "ucr": "Aktualisierung abgeschlossen! \nNeustart!",
         "vgds": "Veröffentlichung {{ver}} wird von GitHub heruntergeladen...",

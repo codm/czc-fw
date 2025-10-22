@@ -601,6 +601,7 @@ static void apiCmdLedAct(String &result)
 static void apiCmdZbFlash(String &result)
 {
     const char* zigbee_firmware_path = "/zigbee/firmware.bin";
+    const uint8_t eventLen = 11;
 
     auto noop = [](float percent) {
         percent = 1.0;
@@ -616,6 +617,9 @@ static void apiCmdZbFlash(String &result)
             eraseWriteZbFile(zigbee_firmware_path, noop ,CCTool);
             removeFileFromFS(zigbee_firmware_path);
         }
+        else {
+            sendEvent(tagZB_FW_err, eventLen, String("Failed!"));
+        }
     }
     else {
         String link = fetchLatestZbFw();
@@ -626,6 +630,9 @@ static void apiCmdZbFlash(String &result)
             if(zigbee_firmware_path != nullptr) {
                 eraseWriteZbFile(zigbee_firmware_path, noop ,CCTool);
                 removeFileFromFS(zigbee_firmware_path);
+            }
+            else {
+                sendEvent(tagZB_FW_err, eventLen, String("Failed!"));
             }
         }
         else
