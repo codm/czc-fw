@@ -613,6 +613,13 @@ static void apiCmdZbFlash(String &result)
         if(!flashZigbeefromURL(serverWeb.arg(argUrl).c_str(), zigbee_firmware_path, CCTool)) {
             DEBUG_PRINTLN("[WEB] Error while downloading and flashing Zigbee firmware");
         }
+        DEBUG_PRINT("[WEB] ARGURL = ");
+        DEBUG_PRINTLN(serverWeb.arg(argUrl).c_str());
+
+        //if(serverWeb.arg(argUrl).c_str() == "https://raw.githubusercontent.com/xyzroe/XZG/zb_fws/ti/router/zr_genericapp_LP_CC1352P7_4_tirtos7_ticlang_20231201.bin?b=115200") {
+            DEBUG_PRINT("[WEB] Changing zBRole to ROUTER");
+            systemCfg.zbRole = ROUTER;
+        //}
     }
     else {
         String link = fetchLatestZbFw();
