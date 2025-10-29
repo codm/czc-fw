@@ -610,15 +610,17 @@ static void apiCmdZbFlash(String &result)
 
     if (serverWeb.hasArg(argUrl))
     {
-        if(!flashZigbeefromURL(serverWeb.arg(argUrl).c_str(), zigbee_firmware_path, CCTool));
+        if(!flashZigbeefromURL(serverWeb.arg(argUrl).c_str(), zigbee_firmware_path, CCTool)) {
             DEBUG_PRINTLN("[WEB] Error while downloading and flashing Zigbee firmware");
+        }
     }
     else {
         String link = fetchLatestZbFw();
         if (link)
         {
-            if(!flashZigbeefromURL(link.c_str(), zigbee_firmware_path, CCTool));
+            if(!flashZigbeefromURL(link.c_str(), zigbee_firmware_path, CCTool)) {
                 DEBUG_PRINTLN("[WEB] Error while downloading and flashing Zigbee firmware from link");
+            }
         }
         else
         {
