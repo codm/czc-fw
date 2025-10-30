@@ -603,11 +603,6 @@ static void apiCmdZbFlash(String &result)
     const char* zigbee_firmware_path = "/zigbee/firmware.bin";
     const uint8_t eventLen = 11;
 
-    auto noop = [](float percent) {
-        percent = 1.0;
-        return percent;
-    };
-
     if (serverWeb.hasArg(argUrl))
     {
         if(!flashZigbeefromURL(serverWeb.arg(argUrl).c_str(), zigbee_firmware_path, CCTool)) {
