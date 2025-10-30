@@ -115,5 +115,6 @@ const char *tagZB_FW_info = "zb.fi";
 const char *tagZB_FW_file = "zb.ff";
 const char *tagZB_FW_err = "zb.fe";
 const char *tagZB_FW_prgs = "zb.fp";
+const char *tagZB_FW_DW_prgs = "zb.dw";
 const char *tagZB_NV_prgs = "zb.nv";
 const char *tagESP_FW_prgs = "esp.fp";

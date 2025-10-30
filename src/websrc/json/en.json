@@ -54,6 +54,7 @@
         "scc": "Socket",
         "sccn": "No connection",
         "sccy": "{{count}} clients",
+        "fwer": "Faulty firmware installation",
         "su": "Connection time",
         "zfs": "Flash size",
         "zie": "IEEE"
@@ -386,6 +387,8 @@
         "vgds": "Downloading release {{ver}} from GitHub...",
         "ucr": "Update complete! Rebooting!",
         "prgs": "Update: {{per}}%",
+        "dwnl": "Downloading firmware: {{per}} %",
+        "flsh": "Updating firmware: {{per}} %",
         "gvt": "GitHub releases"
       },
       "ws": {
@@ -428,7 +431,8 @@
         "f": "Going to flash: {{file}}",
         "fn": "The firmware was successfully installed!",
         "nv": "New version: {{ver}}",
-        "st": "CC2652 flash is starting...",
+        "st": "Zigbee firmware - download is starting...",
+        "stf": "ZigBee firmware - flash is starting...",
         "er": "Erase finished"
       }
     }

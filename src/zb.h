@@ -4,6 +4,10 @@ bool zbLedToggle();
 bool zigbeeErase();
 void nvPrgs(const String &inputMsg);
 void zbEraseNV(void *pvParameters);
-void flashZbUrl(String url);
-bool eraseWriteZbUrl(const char *url, std::function<void(float)> progressShow, CCTools &CCTool);
-bool eraseWriteZbFile(const char *filePath, std::function<void(float)> progressShow, CCTools &CCTool);
+
+bool flashZigbeefromURL(const char *url, const char *filePath, CCTools &CCTool);
+const char* downloadFirmwareFromGithub(const char *url);
+bool eraseWriteZbFile(const char *filePath, CCTools &CCTool);
+float sendPercentageToFrontend(float percent, float previousPercent, const char* eventType);
+bool hasEnoughLittleFsSpaceLeft(size_t firmwareSize);
+bool removeFileFromFS(const char *filePath);

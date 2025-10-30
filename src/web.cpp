@@ -600,15 +600,22 @@ static void apiCmdLedAct(String &result)
 
 static void apiCmdZbFlash(String &result)
 {
+    const char* zigbee_firmware_path = "/zigbee/firmware.bin";
+    const uint8_t eventLen = 11;
+
     if (serverWeb.hasArg(argUrl))
     {
-        flashZbUrl(serverWeb.arg(argUrl));
+        if(!flashZigbeefromURL(serverWeb.arg(argUrl).c_str(), zigbee_firmware_path, CCTool)) {
+            DEBUG_PRINTLN("[WEB] Error while downloading and flashing Zigbee firmware");
+        }
     }
     else {
         String link = fetchLatestZbFw();
         if (link)
         {
-            flashZbUrl(link);
+            if(!flashZigbeefromURL(link.c_str(), zigbee_firmware_path, CCTool)) {
+                DEBUG_PRINTLN("[WEB] Error while downloading and flashing Zigbee firmware from link");
+            }
         }
         else
         {
