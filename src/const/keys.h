@@ -109,6 +109,7 @@ extern const char *tagZB_FW_info;
 extern const char *tagZB_FW_file;
 extern const char *tagZB_FW_err;
 extern const char *tagZB_FW_prgs;
+extern const char *tagZB_FW_DW_prgs;
 extern const char *tagZB_NV_prgs;
 extern const char *tagESP_FW_prgs;
 
