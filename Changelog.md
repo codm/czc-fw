@@ -12,3 +12,6 @@ All significant changes to the project will be documented in this file
 - We changed the text in the update-available window.
 
 - We changed the device model name on the status page.
+
+## [V2.0.3] - XX-YY-XXYY
+- We added a push restart-notification to the Zigbee/Serial setting tab 
