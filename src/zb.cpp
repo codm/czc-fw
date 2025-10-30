@@ -218,12 +218,12 @@ const char* downloadFirmwareFromGithub(const char *url) {
 
                 if(http_remaining_file_length > 0)
                     http_remaining_file_length -= http_payload_size;
-                DEBUG_PRINT("---- REMAINING FILE SIZE: ");
+                DEBUG_PRINT("[DOWNLOAD] REMAINING FILE SIZE: ");
                 DEBUG_PRINTLN(http_remaining_file_length);
             }
 
             float percent = ((float)http_total_file_length - http_remaining_file_length) / http_total_file_length * 100.0f;  
-            previousPercent = sendPercentageToFrontend(percent, previousPercent, tagZB_FW_prgs);
+            previousPercent = sendPercentageToFrontend(percent, previousPercent, tagZB_FW_DW_prgs);
 
             delay(1); // yield to other applications
         }
