@@ -494,7 +494,7 @@ function apiGetPage(page, doneCall, loader = true) {
 					url: e.currentTarget.action,
 					data: data,
 					success: function () {
-						if(target == "network") {
+						if(target == "network" || target == "serialSettings") {
 							modalConstructor("saveOk");
 						}
 					},
