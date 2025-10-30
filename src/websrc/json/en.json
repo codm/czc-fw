@@ -431,8 +431,8 @@
         "f": "Going to flash: {{file}}",
         "fn": "The firmware was successfully installed!",
         "nv": "New version: {{ver}}",
-        "st": "CC2652-download is starting...",
-        "stf": "CC2652-flash is starting...",
+        "st": "Zigbee firmware - download is starting...",
+        "stf": "ZigBee firmware - flash is starting...",
         "er": "Erase finished"
       }
     }
