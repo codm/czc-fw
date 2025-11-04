@@ -281,7 +281,8 @@
       "zu": "Zigbee update (in develop)",
       "saf": "Show available...",
       "zgu": "Zigbee",
-      "eznr": "Erase NVRAM"
+      "eznr": "Erase NVRAM",
+      "ulcc": "Unlearn CC"
     },
     "lo": {
       "pt": "Login - CZC",

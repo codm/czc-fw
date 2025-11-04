@@ -358,7 +358,8 @@
       "zu": "Zigbee-Update (in Entwicklung)",
       "saf": "Verfügbare Firmwares anzeigen",
       "zgu": "Git CC2652-Update",
-      "eznr": "NVRAM löschen"
+      "eznr": "NVRAM löschen",
+      "ulcc": "Unlearn CC"
     },
     "vp": {
       "hn": {
