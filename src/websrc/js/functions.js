@@ -1362,7 +1362,8 @@ function reconnectEvents() {
 	}
 }
 
-function startZbFlash(link) {
+// Pre-flash Window with "Cancel" and "Im sure" buttons
+function startZbFlash(link, fwMode) {
 	$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_DNS_CHECK, function (data) {
 		reconnectEvents();
 
@@ -1388,7 +1389,7 @@ function startZbFlash(link) {
 			title: i18next.t("md.esp.fu.wm"),
 			disabled: true,
 			click: function () {
-				$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_ZB_FLASH + "&url=" + link);
+				$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_ZB_FLASH + "&url=" + link + "&fwMode=" + fwMode);
 				$(modalBtns).html("");
 				modalAddSpiner();
 				$(modalBody).html("");
@@ -1513,21 +1514,29 @@ function findAllVersionsSorted(data, chip) {
 }
 
 // Function definition outside the switch-case
+// creates the Webinterface block on System -> Firmware -> Zigbee -> Show available...
 function createReleaseBlock(file, deviceType) {
+
+	const deviceTypeToFwMap = {
+		1: "coordinator",
+		2: "router",
+		3: "thread"
+	};
+	deviceType = deviceTypeToFwMap[deviceType];
 
 	let deviceName;
 	let deviceIcon;
 	let buttonClass;
 
-	if (deviceType == 1) {
+	if (deviceType == "coordinator") {
 		deviceName = i18next.t('md.zb.dtc');
 		buttonClass = "btn btn-outline-danger";
 		deviceIcon = "📡";
-	} else if (deviceType == 2) {
+	} else if (deviceType == "router") {
 		deviceName = i18next.t('md.zb.dtr');
 		buttonClass = "btn btn-outline-success";
 		deviceIcon = "🛰️";
-	} else if (deviceType == 3) {
+	} else if (deviceType == "thread") {
 		deviceName = i18next.t('md.zb.dtt');
 		buttonClass = "btn btn-outline-primary";
 		deviceIcon = "🚀";
@@ -1548,7 +1557,7 @@ function createReleaseBlock(file, deviceType) {
 	const button = $('<a>', {
 		"class": buttonClass,
 		"click": function () {
-			startZbFlash(file.link + "?b=" + file.baud);
+			startZbFlash(file.link + "?b=" + file.baud, deviceType);
 			let tooltipInstance = bootstrap.Tooltip.getInstance(this);
 			if (tooltipInstance) {
 				tooltipInstance.hide();
