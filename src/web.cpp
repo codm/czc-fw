@@ -647,6 +647,7 @@ void changeZbMode(String fwMode) {
         systemCfg.zbRole = OPENTHREAD;
         DEBUG_PRINTLN("[WEB] Changed ZbRole to OPENTHREAD");
     }
+    saveSystemConfig(systemCfg);
 }
 
 static void apiCmdDefault(String &result)
