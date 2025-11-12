@@ -183,7 +183,7 @@ const char* downloadFirmwareFromGithub(const char *url) {
         WiFiClient* http_read_stream = http.getStreamPtr();
 
         DEBUG_PRINTLN("[LITTLEFS] check filesystem, create and open Firmware file");
-        if(!hasEnoughLittleFsSpaceLeft(725000)) {
+        if(!hasEnoughLittleFsSpaceLeft(http_total_file_length)) {
             DEBUG_PRINTLN("[LITTLEFS] ERROR: not enough space in FS, returning nullptr");
             return nullptr;
         }
@@ -221,7 +221,7 @@ const char* downloadFirmwareFromGithub(const char *url) {
             }
 
             float percent = ((float)http_total_file_length - http_remaining_file_length) / http_total_file_length * 100.0f;  
-            previousPercent = sendPercentageToFrontend(percent, previousPercent, tagZB_FW_prgs);
+            previousPercent = sendPercentageToFrontend(percent, previousPercent, tagZB_FW_DW_prgs);
 
             delay(1); // yield to other applications
         }

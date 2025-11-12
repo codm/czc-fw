@@ -106,8 +106,8 @@
         "f": "Wird geflasht: {{file}}",
         "fn": "Erfolgreich geflasht!",
         "nv": "Neue Version: {{ver}}",
-        "st": "CC2652-Download startet...",
-        "stf": "CC2652-Flash startet...",
+        "st": "Zigbee Firmware - Download startet...",
+        "stf": "ZigBee Firmware - Flash startet...",
         "er": "Löschen beendet"
       }
     }
