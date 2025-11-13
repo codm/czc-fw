@@ -743,11 +743,15 @@ function showCardDrawIcon(property, values) {
 	if (property === "ccMode") {
 		const ccMode = getCcModeFromIndex(values[property]);
 		let text;
-		console.log("CCMODE: --- ");
-		console.log(ccMode);
+
+		const configGeneratorWrapper = document.getElementById("configGeneratorWrapper");
+		const ccModeSwitchWrapper = document.getElementById("ccModeSwitchWrapper");
+		configGeneratorWrapper.classList.add("d-none");
+
 		switch (ccMode) {
 			case "coordinator":
 				text = i18next.t('md.zb.dtc');
+				configGeneratorWrapper.classList.remove("d-none");
 				break;
 			case "router":
 				text = i18next.t('md.zb.dtr');
