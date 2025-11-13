@@ -628,7 +628,7 @@ static void apiCmdZbFlash(String &result)
 }
 
 void changeZbMode(String fwMode) {
-    if(fwMode == "coordinator") {
+    if (fwMode == "coordinator") {
         systemCfg.zbRole = COORDINATOR;
         DEBUG_PRINTLN("[WEB] Changed ZbRole to COORDINATOR");
         
