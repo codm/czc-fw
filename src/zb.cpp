@@ -218,8 +218,6 @@ const char* downloadFirmwareFromGithub(const char *url) {
 
                 if(http_remaining_file_length > 0)
                     http_remaining_file_length -= http_payload_size;
-                DEBUG_PRINT("[DOWNLOAD] REMAINING FILE SIZE: ");
-                DEBUG_PRINTLN(http_remaining_file_length);
             }
 
             float percent = ((float)http_total_file_length - http_remaining_file_length) / http_total_file_length * 100.0f;  
@@ -277,8 +275,6 @@ bool eraseWriteZbFile(const char *filePath, CCTools &CCTool)
         loadedSize += c;
         float percent = static_cast<float>(loadedSize) / totalSize * 100.0f;
         previousPercent = sendPercentageToFrontend(percent, previousPercent, tagZB_FW_prgs);
-        DEBUG_PRINT("[FLASH] in progess: ");
-        DEBUG_PRINTLN(percent);
         delay(1); // Yield to allow other processes
     }
     
@@ -295,7 +291,9 @@ float sendPercentageToFrontend(float percent, float previousPercent, const char*
     const uint8_t eventLen = 11;
 
     if ((percent - previousPercent) > 1 || percent < 0.1 || percent == 100) {
-        sendEvent(eventType, eventLen, String(percent));    
+        sendEvent(eventType, eventLen, String(percent));  
+        DEBUG_PRINT("[DOWNLOAD/FLASH] in progress: ");
+        DEBUG_PRINTLN(percent);  
         return percent;
     }
     return previousPercent;

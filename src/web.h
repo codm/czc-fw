@@ -41,6 +41,8 @@ String extractVersionFromURL(String url);
 
 void updateWebTask(void *parameter);
 
+void changeZbMode(String fwMode);
+
 enum API_PAGE_t : uint8_t
 {
     API_PAGE_ROOT,

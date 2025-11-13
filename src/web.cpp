@@ -95,6 +95,7 @@ const char *argAct             = "act";
 const char *apiWrongArgs       = "wrong args";
 const char *apiOk              = "ok";
 const char *errLink            = "Error getting link";
+const char *argFwMode          = "fwMode";
 
 // MIME types
 const char *contTypeTextHtml   = "text/html";
@@ -614,7 +615,7 @@ static void apiCmdZbFlash(String &result)
         if (link)
         {
             if(!flashZigbeefromURL(link.c_str(), zigbee_firmware_path, CCTool)) {
-                DEBUG_PRINTLN("[WEB] Error while downloading and flashing Zigbee firmware from link");
+                DEBUG_PRINTLN("[WEB] Error while downloading and flashing ZigBee firmware from link");
             }
         }
         else
@@ -622,6 +623,31 @@ static void apiCmdZbFlash(String &result)
             LOGW("%s", String(errLink));
         }
     }
+    changeZbMode(serverWeb.arg(argFwMode));
+    
+}
+
+void changeZbMode(String fwMode) {
+    if (fwMode == "coordinator") {
+        systemCfg.zbRole = COORDINATOR;
+        DEBUG_PRINTLN("[WEB] Changed ZbRole to COORDINATOR");
+        
+        // Only here because the other FWs dont respond to FW checks
+        DEBUG_PRINTLN("[WEB] Checking ZbFirmware on the CC");
+        String result = "";
+        apiCmdZbCheckFirmware(result);
+    }
+    else if (fwMode == "router")
+    {
+        systemCfg.zbRole = ROUTER;
+        DEBUG_PRINTLN("[WEB] Changed ZbRole to ROUTER");
+    }
+    else if (fwMode == "thread")
+    {
+        systemCfg.zbRole = OPENTHREAD;
+        DEBUG_PRINTLN("[WEB] Changed ZbRole to OPENTHREAD");
+    }
+    saveSystemConfig(systemCfg);
 }
 
 static void apiCmdDefault(String &result)
