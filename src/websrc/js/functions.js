@@ -739,6 +739,28 @@ function showCardDrawIcon(property, values) {
 		}
 		setIconGlow('vpnIcon', status);
 	}
+
+	if (property === "ccMode") {
+		const ccMode = getCcModeFromIndex(values[property]);
+		let text;
+		console.log("CCMODE: --- ");
+		console.log(ccMode);
+		switch (ccMode) {
+			case "coordinator":
+				text = i18next.t('md.zb.dtc');
+				break;
+			case "router":
+				text = i18next.t('md.zb.dtr');
+				break;
+			case "openthread":
+				text = i18next.t('md.zb.dtt');
+				break;
+			default:
+				text = "[ERROR] Unknown Mode";
+				break;
+		}
+		document.getElementById("ccMode").innerHTML = text;
+	}
 }
 
 function updateTooltips() {
@@ -1513,16 +1535,19 @@ function findAllVersionsSorted(data, chip) {
 	return result;
 }
 
-// Function definition outside the switch-case
-// creates the Webinterface block on System -> Firmware -> Zigbee -> Show available...
-function createReleaseBlock(file, deviceType) {
-
+function getCcModeFromIndex(index) {
 	const deviceTypeToFwMap = {
 		1: "coordinator",
 		2: "router",
 		3: "thread"
 	};
-	deviceType = deviceTypeToFwMap[deviceType];
+	return deviceTypeToFwMap[index];
+}
+
+// Function definition outside the switch-case
+// creates the Webinterface block on System -> Firmware -> Zigbee -> Show available...
+function createReleaseBlock(file, deviceType) {
+	deviceType = getCcModeFromIndex(deviceType);
 
 	let deviceName;
 	let deviceIcon;

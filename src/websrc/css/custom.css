@@ -313,12 +313,17 @@ body {
   border-color: var(--link-color) !important;
 }
 
-#clock {
+#clock, #ccMode {
   border-color: var(--card-background-color);
   color: var(--card-background-color);
   --bs-btn-padding-y: 0.05rem !important;
   --bs-btn-padding-x: 0.3rem !important;
   border-width: revert;
+}
+
+div#ccMode {
+    border: 2px solid white;
+    cursor: inherit;
 }
 
 .tooltip {

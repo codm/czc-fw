@@ -1618,8 +1618,13 @@ static inline void getRootVpnHusarnet(DynamicJsonDocument &doc)
 
         // doc[wgDeviceAddr] = vpnCfg.wgLocalIP.toString();//WgSettings.localAddr;
         doc[hnHostName] = vpnCfg.hnHostName;
-        doc[hnInit]     = vars.vpnHnInit ? 1 : 0;
+        doc[hnInit] = vars.vpnHnInit ? 1 : 0;
     }
+}
+
+static inline void getRootMode(DynamicJsonDocument &doc){
+    const char *ccMode = "ccMode";
+    doc[ccMode] = systemCfg.zbRole;
 }
 
 static inline void getRootUptime(DynamicJsonDocument &doc)
@@ -1743,20 +1748,19 @@ String getRootData(bool update)
     DynamicJsonDocument doc(2048);
 
     const char *noConn = "noConn";
-    getRootEthTab       (doc, update, noConn);
-    getRootWifi         (doc, update, noConn);
-
-    getRootHwMisc       (doc, update);
-
-    getRootSockets      (doc);
-    getRootTime         (doc);
-    getRootUptime       (doc);
-    getRootCpuTemp      (doc);
-    getRootOneWireTemp  (doc);
-    getRootNvsStats     (doc);
-    getRootMqtt         (doc);
-    getRootVpnWireGuard (doc);
-    getRootVpnHusarnet  (doc);
+    getRootEthTab(doc, update, noConn);
+    getRootWifi(doc, update, noConn);
+    getRootHwMisc(doc, update);
+    getRootSockets(doc);
+    getRootTime(doc);
+    getRootUptime(doc);
+    getRootCpuTemp(doc);
+    getRootOneWireTemp(doc);
+    getRootNvsStats(doc);
+    getRootMqtt(doc);
+    getRootVpnWireGuard(doc);
+    getRootVpnHusarnet(doc);
+    getRootMode(doc);
 
     String result;
     serializeJson(doc, result);
