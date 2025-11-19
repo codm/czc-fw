@@ -633,7 +633,7 @@ void changeZbMode(String fwMode) {
         DEBUG_PRINTLN("[WEB] Changed ZbRole to COORDINATOR");
         
         // Only here because the other FWs dont respond to FW checks
-        DEBUG_PRINTLN("[WEB] Checking ZbFirmware on the CC");
+        DEBUG_PRINTLN("[WEB] Checking ZigBee firmware on the CC");
         String result = "";
         apiCmdZbCheckFirmware(result);
     }
