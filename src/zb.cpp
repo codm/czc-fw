@@ -138,19 +138,28 @@ void zbEraseNV(void *pvParameters)
 
 bool flashZigbeefromURL(const char *url, const char *zigbee_firmware_path, CCTools &CCTool) {
     const uint8_t eventLen = 11;
+    bool update_successful = false;
+
+    ledControl.modeLED.mode = LED_BLINK_3Hz;
+    vars.zbFlashing = true;
 
     // Remove first if the previous firmware download had an error and the file was not deleted
     removeFileFromFS(zigbee_firmware_path);
     zigbee_firmware_path = downloadFirmwareFromGithub(url);
     if(zigbee_firmware_path != nullptr) {
-        eraseWriteZbFile(zigbee_firmware_path,CCTool);
-        removeFileFromFS(zigbee_firmware_path);
+        update_successful = eraseWriteZbFile(zigbee_firmware_path,CCTool) && removeFileFromFS(zigbee_firmware_path);  
+        if(!update_successful) {
+            DEBUG_PRINTLN("[FLASH] Error while flashing or erasing file -> function returned false");
+        }
     }
     else {
         sendEvent(tagZB_FW_err, eventLen, String("Failed!"));
-        return false;
+        DEBUG_PRINTLN("[HTTP] download returned file nullptr");
     }
-    return true;
+
+    ledControl.modeLED.mode = LED_OFF;
+    vars.zbFlashing = false;
+    return update_successful;
 }
 
 const char* downloadFirmwareFromGithub(const char *url) {
