@@ -445,15 +445,11 @@ void handleEvents()
     }
 }
 
-void sendEvent(const char *event,
-               const uint8_t evsz,
-               const String data)
+void sendEvent(const char *event, const String data)
 {
     if (eventsClient)
     {
-        char evnmArr[10 + evsz];
-        snprintf(evnmArr, sizeof(evnmArr), "event: %s\n", event);
-        eventsClient.print(evnmArr);
+        eventsClient.print(String("event: ") + event + "\n");
         eventsClient.print(String("data: ") + data + "\n\n");
         eventsClient.flush();
     }
@@ -602,7 +598,13 @@ static void apiCmdLedAct(String &result)
 static void apiCmdZbFlash(String &result)
 {
     const char* zigbee_firmware_path = "/zigbee/firmware.bin";
-    const uint8_t eventLen = 11;
+
+    DEBUG_PRINT("[WEB] There are currently ");
+    DEBUG_PRINT(vars.connectedClients);
+    DEBUG_PRINTLN(" connected clients");
+    if(vars.connectedClients != 0) {
+        //sendEvent();
+    }
 
     if (serverWeb.hasArg(argUrl))
     {
@@ -1039,8 +1041,6 @@ void printEachKeyValuePair(const String &jsonString)
         return;
     }
 
-    const uint8_t eventLen = 100;
-
     for (JsonPair kv : doc.as<JsonObject>())
     {
         DynamicJsonDocument pairDoc(256);
@@ -1049,15 +1049,14 @@ void printEachKeyValuePair(const String &jsonString)
         String output;
         serializeJson(pairDoc, output);
 
-        sendEvent("root_update", eventLen, String(output));
+        sendEvent("root_update", String(output));
     }
-    sendEvent("root_update", eventLen, String("finish"));
+    sendEvent("root_update", String("finish"));
 }
 
 void updateWebTask(void *parameter)
 {
     TickType_t lastWakeTime = xTaskGetTickCount();
-    const uint8_t eventLen = 100;
     while (1)
     {
         String root_data = getRootData(true);
@@ -1885,34 +1884,12 @@ void printLogMsg(String msg)
     logPush('\n');
     LOGI("%s", msg.c_str());
 }
-/*
-void progressNvRamFunc(unsigned int progress, unsigned int total)
-{
-
-    const char *tagESP_FW_prgs = "ESP_FW_prgs";
-    const uint8_t eventLen = 11;
-
-    float percent = ((float)progress / total) * 100.0;
-
-    sendEvent(tagESP_FW_prgs, eventLen, String(percent));
-    // printLogMsg(String(percent));
-
-#ifdef DEBUG
-    if (int(percent) % 5 == 0)
-    {
-        LOGD("Update ESP32 progress: %s of %s | %s%", String(progress), String(total), String(percent));
-    }
-#endif
-};
-*/
 
 void progressFunc(unsigned int progress, unsigned int total)
 {
-    const uint8_t eventLen = 11;
-
     float percent = ((float)progress / total) * 100.0;
 
-    sendEvent(tagESP_FW_prgs, eventLen, String(percent));
+    sendEvent(tagESP_FW_prgs, String(percent));
     // printLogMsg(String(percent));
 
 #ifdef DEBUG
