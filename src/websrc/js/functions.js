@@ -51,7 +51,8 @@ const commands = {
 	CMD_ZB_LED_TOG: 12,
 	CMD_ESP_FAC_RES: 13,
 	CMD_ZB_ERASE_NVRAM: 14,
-	CMD_DNS_CHECK: 15
+	CMD_DNS_CHECK: 15,
+	CMD_CLIENT_CHECK: 16
 }
 
 const api = {
@@ -1388,8 +1389,16 @@ function reconnectEvents() {
 	}
 }
 
-// Pre-flash Window with "Cancel" and "Im sure" buttons
 function startZbFlash(link, fwMode) {
+	// Check if clients are connected and create info modal
+	$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_CLIENT_CHECK, function (connectedClients) {
+		console.log(connectedClients);
+		if(connectedClients != 0) {
+			modalConstructor("flashESP");
+		}
+	});
+
+	// Pre-flash Window with "Cancel" and "Im sure" buttons 
 	$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_DNS_CHECK, function (data) {
 		reconnectEvents();
 

@@ -152,6 +152,7 @@ static void apiCmdZbCheckFirmware (String &result);
 static void apiCmdZbLedToggle     (String &result);
 static void apiCmdFactoryReset    (String &result);
 static void apiCmdDnsCheck        (String &result);
+static void apiCmdClientCheck (String &result);
 
 // functions called exactly once each
 // from getRootData():
@@ -709,6 +710,10 @@ static void apiCmdDnsCheck(String &result)
     checkDNS();
 }
 
+static void apiCmdClientCheck (String &result) {
+    serverWeb.send(HTTP_CODE_OK, contTypeText, String(numOfConnectedClients()));
+}
+
 static void apiCmd()
 {
     static void (*apiCmdFunctions[])(String &result) =
@@ -729,7 +734,8 @@ static void apiCmd()
         apiCmdZbLedToggle,
         apiCmdFactoryReset,
         apiCmdEraseNvram,
-        apiCmdDnsCheck
+        apiCmdDnsCheck,
+        apiCmdClientCheck,
     };
     constexpr int numFunctions = sizeof(apiCmdFunctions) / sizeof(apiCmdFunctions[0]);
     String result = apiWrongArgs;
