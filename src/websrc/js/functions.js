@@ -1389,16 +1389,33 @@ function reconnectEvents() {
 	}
 }
 
+// Check if clients are connected and configure corresponding modal
+// modal gets created in HTML 
 function startZbFlash(link, fwMode) {
-	// Check if clients are connected and create info modal
 	$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_CLIENT_CHECK, function (connectedClients) {
-		console.log(connectedClients);
+		console.log("Connected Clients: " + connectedClients);
 		if(connectedClients != 0) {
-			modalConstructor("flashESP");
+			configureClientErrorModal();
+		}
+		else {
+			configureZigBeeFlashModal(link, fwMode);
 		}
 	});
+}
 
-	// Pre-flash Window with "Cancel" and "Im sure" buttons 
+function configureClientErrorModal() {
+	$(modalBtns).html("");
+	$(modalBody).html("");
+	
+	$("<div>", {
+			text: i18next.t("md.zb.ccn"),
+			class: "my-1 text-sm-center text-danger"
+	}).appendTo(modalBody);
+
+	modalAddClose();
+}
+
+function configureZigBeeFlashModal(link, fwMode) {
 	$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_DNS_CHECK, function (data) {
 		reconnectEvents();
 

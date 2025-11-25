@@ -86,7 +86,9 @@
       "rfm": "Firmware-Informationen werden abgerufen...",
       "dtt": "OpenThread",
       "ntf": "Die Thread-Firmware fehlt.",
-      "cte": "Klicken Sie, um die Informationen zu erweitern"
+      "cte": "Klicken Sie, um die Informationen zu erweitern",
+      "ccn": "Updaten nicht möglich solange Clients (Home Assistant, etc.) verbunden sind!"
+
     },
     "kw": {
       "msg": "Mit dieser Funktion können Sie einen der Kommunikationskanäle aktiv lassen und auf die Weboberfläche zugreifen. \nDas Gerät wählt selbst je nach Priorität einen verfügbaren Kanal aus: WIFI, ETHERNET, WIFI AP"
