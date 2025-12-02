@@ -37,6 +37,9 @@ extern CCTools CCTool;
 
 bool zbFwCheck()
 {
+    // As long as the ROUTER Version doesn't work with this check this manual override will guarantee a return true in non COORDINATOR mode
+    if(systemCfg.zbRole != COORDINATOR) return true;
+
     const int maxAttempts = 3;
     for (int attempt = 0; attempt < maxAttempts; attempt++)
     {
