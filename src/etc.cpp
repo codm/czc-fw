@@ -767,7 +767,7 @@ void wgLoop()
           {
             LOGD("Peer disconnect");
           }
-          vars.vpnWgPeerIp.clear();
+          vars.vpnWgPeerIp = INADDR_NONE;
           vars.vpnWgConnect = false;
         }
       }
