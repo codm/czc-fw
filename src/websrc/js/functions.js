@@ -746,16 +746,35 @@ function showCardDrawIcon(property, values) {
 		let text;
 
 		const configGeneratorWrapper = document.getElementById("configGeneratorWrapper");
+		const serialConfigurationWrapper = document.getElementById("serialConfigurationWrapper");
+		const routerConfigInformation = document.getElementById("routerConfigInformation");
 		const ccModeSwitchWrapper = document.getElementById("ccModeSwitchWrapper");
-		configGeneratorWrapper.classList.add("d-none");
+
+		if (configGeneratorWrapper) {
+			configGeneratorWrapper.classList.add("d-none");
+		}
+		if (serialConfigurationWrapper) {
+			serialConfigurationWrapper.classList.add("d-none");
+		}
+		if (routerConfigInformation) {
+			routerConfigInformation.classList.add("d-none");
+		}
 
 		switch (ccMode) {
 			case "coordinator":
 				text = i18next.t('md.zb.dtc');
-				configGeneratorWrapper.classList.remove("d-none");
+				if (configGeneratorWrapper) {
+					configGeneratorWrapper.classList.remove("d-none");
+				}
+				if (serialConfigurationWrapper) {
+					serialConfigurationWrapper.classList.remove("d-none");
+				}
 				break;
 			case "router":
 				text = i18next.t('md.zb.dtr');
+				if (routerConfigInformation) {
+					routerConfigInformation.classList.remove("d-none");
+				}
 				break;
 			case "openthread":
 				text = i18next.t('md.zb.dtt');
