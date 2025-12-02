@@ -115,14 +115,12 @@ bool zigbeeErase()
 }
 void nvPrgs(const String &inputMsg)
 {
-
-    const uint8_t eventLen = 30;
     String msg = inputMsg;
     if (msg.length() > 25)
     {
         msg = msg.substring(0, 25);
     }
-    sendEvent(tagZB_NV_prgs, eventLen, msg);
+    sendEvent(tagZB_NV_prgs, msg);
     LOGD("%s", msg.c_str());
 }
 
@@ -137,25 +135,32 @@ void zbEraseNV(void *pvParameters)
 }
 
 bool flashZigbeefromURL(const char *url, const char *zigbee_firmware_path, CCTools &CCTool) {
-    const uint8_t eventLen = 11;
+    bool update_successful = false;
+
+    ledControl.modeLED.mode = LED_BLINK_3Hz;
+    vars.zbFlashing = true;
 
     // Remove first if the previous firmware download had an error and the file was not deleted
     removeFileFromFS(zigbee_firmware_path);
     zigbee_firmware_path = downloadFirmwareFromGithub(url);
     if(zigbee_firmware_path != nullptr) {
-        eraseWriteZbFile(zigbee_firmware_path,CCTool);
-        removeFileFromFS(zigbee_firmware_path);
+        update_successful = eraseWriteZbFile(zigbee_firmware_path,CCTool) && removeFileFromFS(zigbee_firmware_path);  
+        if(!update_successful) {
+            DEBUG_PRINTLN("[FLASH] Error while flashing or erasing file -> function returned false");
+        }
     }
     else {
-        sendEvent(tagZB_FW_err, eventLen, String("Failed!"));
-        return false;
+        sendEvent(tagZB_FW_err, String("Failed!"));
+        DEBUG_PRINTLN("[HTTP] download returned file nullptr");
     }
-    return true;
+
+    ledControl.modeLED.mode = LED_OFF;
+    vars.zbFlashing = false;
+    return update_successful;
 }
 
 const char* downloadFirmwareFromGithub(const char *url) {
-    const uint8_t eventLen = 11;
-    sendEvent(tagZB_FW_info, eventLen, String("startDownload"));
+    sendEvent(tagZB_FW_info, String("startDownload"));
 
     HTTPClient http;
     WiFiClientSecure secure_client;
@@ -238,8 +243,7 @@ const char* downloadFirmwareFromGithub(const char *url) {
 
 bool eraseWriteZbFile(const char *filePath, CCTools &CCTool)
 {
-    const uint8_t eventLen = 11;
-    sendEvent(tagZB_FW_info, eventLen, String("startFlash"));
+    sendEvent(tagZB_FW_info, String("startFlash"));
     
     File file = LittleFS.open(filePath, "r");
     if (!file)
@@ -281,17 +285,15 @@ bool eraseWriteZbFile(const char *filePath, CCTools &CCTool)
     DEBUG_PRINTLN("[FLASH] Completed!");
     file.close();
 
-    sendEvent(tagZB_FW_info, eventLen, String("finishFlash"));
+    sendEvent(tagZB_FW_info, String("finishFlash"));
 
     CCTool.restart();
     return true;
 }
 
 float sendPercentageToFrontend(float percent, float previousPercent, const char* eventType) {
-    const uint8_t eventLen = 11;
-
     if ((percent - previousPercent) > 1 || percent < 0.1 || percent == 100) {
-        sendEvent(eventType, eventLen, String(percent));  
+        sendEvent(eventType, String(percent));  
         DEBUG_PRINT("[DOWNLOAD/FLASH] in progress: ");
         DEBUG_PRINTLN(percent);  
         return percent;

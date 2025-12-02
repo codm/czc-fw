@@ -152,6 +152,7 @@ static void apiCmdZbCheckFirmware (String &result);
 static void apiCmdZbLedToggle     (String &result);
 static void apiCmdFactoryReset    (String &result);
 static void apiCmdDnsCheck        (String &result);
+static void apiCmdClientCheck (String &result);
 
 // functions called exactly once each
 // from getRootData():
@@ -445,15 +446,11 @@ void handleEvents()
     }
 }
 
-void sendEvent(const char *event,
-               const uint8_t evsz,
-               const String data)
+void sendEvent(const char *event, const String data)
 {
     if (eventsClient)
     {
-        char evnmArr[10 + evsz];
-        snprintf(evnmArr, sizeof(evnmArr), "event: %s\n", event);
-        eventsClient.print(evnmArr);
+        eventsClient.print(String("event: ") + event + "\n");
         eventsClient.print(String("data: ") + data + "\n\n");
         eventsClient.flush();
     }
@@ -602,7 +599,13 @@ static void apiCmdLedAct(String &result)
 static void apiCmdZbFlash(String &result)
 {
     const char* zigbee_firmware_path = "/zigbee/firmware.bin";
-    const uint8_t eventLen = 11;
+
+    DEBUG_PRINT("[WEB] There are currently ");
+    DEBUG_PRINT(vars.connectedClients);
+    DEBUG_PRINTLN(" connected clients");
+    if(vars.connectedClients != 0) {
+        //sendEvent();
+    }
 
     if (serverWeb.hasArg(argUrl))
     {
@@ -633,7 +636,7 @@ void changeZbMode(String fwMode) {
         DEBUG_PRINTLN("[WEB] Changed ZbRole to COORDINATOR");
         
         // Only here because the other FWs dont respond to FW checks
-        DEBUG_PRINTLN("[WEB] Checking ZbFirmware on the CC");
+        DEBUG_PRINTLN("[WEB] Checking ZigBee firmware on the CC");
         String result = "";
         apiCmdZbCheckFirmware(result);
     }
@@ -707,6 +710,10 @@ static void apiCmdDnsCheck(String &result)
     checkDNS();
 }
 
+static void apiCmdClientCheck (String &result) {
+    serverWeb.send(HTTP_CODE_OK, contTypeText, String(numOfConnectedClients()));
+}
+
 static void apiCmd()
 {
     static void (*apiCmdFunctions[])(String &result) =
@@ -727,7 +734,8 @@ static void apiCmd()
         apiCmdZbLedToggle,
         apiCmdFactoryReset,
         apiCmdEraseNvram,
-        apiCmdDnsCheck
+        apiCmdDnsCheck,
+        apiCmdClientCheck,
     };
     constexpr int numFunctions = sizeof(apiCmdFunctions) / sizeof(apiCmdFunctions[0]);
     String result = apiWrongArgs;
@@ -1039,8 +1047,6 @@ void printEachKeyValuePair(const String &jsonString)
         return;
     }
 
-    const uint8_t eventLen = 100;
-
     for (JsonPair kv : doc.as<JsonObject>())
     {
         DynamicJsonDocument pairDoc(256);
@@ -1049,15 +1055,14 @@ void printEachKeyValuePair(const String &jsonString)
         String output;
         serializeJson(pairDoc, output);
 
-        sendEvent("root_update", eventLen, String(output));
+        sendEvent("root_update", String(output));
     }
-    sendEvent("root_update", eventLen, String("finish"));
+    sendEvent("root_update", String("finish"));
 }
 
 void updateWebTask(void *parameter)
 {
     TickType_t lastWakeTime = xTaskGetTickCount();
-    const uint8_t eventLen = 100;
     while (1)
     {
         String root_data = getRootData(true);
@@ -1618,8 +1623,13 @@ static inline void getRootVpnHusarnet(DynamicJsonDocument &doc)
 
         // doc[wgDeviceAddr] = vpnCfg.wgLocalIP.toString();//WgSettings.localAddr;
         doc[hnHostName] = vpnCfg.hnHostName;
-        doc[hnInit]     = vars.vpnHnInit ? 1 : 0;
+        doc[hnInit] = vars.vpnHnInit ? 1 : 0;
     }
+}
+
+static inline void getRootMode(DynamicJsonDocument &doc){
+    const char *ccMode = "ccMode";
+    doc[ccMode] = systemCfg.zbRole;
 }
 
 static inline void getRootUptime(DynamicJsonDocument &doc)
@@ -1743,20 +1753,19 @@ String getRootData(bool update)
     DynamicJsonDocument doc(2048);
 
     const char *noConn = "noConn";
-    getRootEthTab       (doc, update, noConn);
-    getRootWifi         (doc, update, noConn);
-
-    getRootHwMisc       (doc, update);
-
-    getRootSockets      (doc);
-    getRootTime         (doc);
-    getRootUptime       (doc);
-    getRootCpuTemp      (doc);
-    getRootOneWireTemp  (doc);
-    getRootNvsStats     (doc);
-    getRootMqtt         (doc);
-    getRootVpnWireGuard (doc);
-    getRootVpnHusarnet  (doc);
+    getRootEthTab(doc, update, noConn);
+    getRootWifi(doc, update, noConn);
+    getRootHwMisc(doc, update);
+    getRootSockets(doc);
+    getRootTime(doc);
+    getRootUptime(doc);
+    getRootCpuTemp(doc);
+    getRootOneWireTemp(doc);
+    getRootNvsStats(doc);
+    getRootMqtt(doc);
+    getRootVpnWireGuard(doc);
+    getRootVpnHusarnet(doc);
+    getRootMode(doc);
 
     String result;
     serializeJson(doc, result);
@@ -1881,34 +1890,12 @@ void printLogMsg(String msg)
     logPush('\n');
     LOGI("%s", msg.c_str());
 }
-/*
-void progressNvRamFunc(unsigned int progress, unsigned int total)
-{
-
-    const char *tagESP_FW_prgs = "ESP_FW_prgs";
-    const uint8_t eventLen = 11;
-
-    float percent = ((float)progress / total) * 100.0;
-
-    sendEvent(tagESP_FW_prgs, eventLen, String(percent));
-    // printLogMsg(String(percent));
-
-#ifdef DEBUG
-    if (int(percent) % 5 == 0)
-    {
-        LOGD("Update ESP32 progress: %s of %s | %s%", String(progress), String(total), String(percent));
-    }
-#endif
-};
-*/
 
 void progressFunc(unsigned int progress, unsigned int total)
 {
-    const uint8_t eventLen = 11;
-
     float percent = ((float)progress / total) * 100.0;
 
-    sendEvent(tagESP_FW_prgs, eventLen, String(percent));
+    sendEvent(tagESP_FW_prgs, String(percent));
     // printLogMsg(String(percent));
 
 #ifdef DEBUG

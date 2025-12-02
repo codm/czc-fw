@@ -50,4 +50,4 @@ String getTime();
 
 void checkUpdateAvail();
 
-
+int numOfConnectedClients();

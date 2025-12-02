@@ -948,3 +948,7 @@ void checkUpdateAvail()
     }
   }
 }
+
+int numOfConnectedClients() {
+  return vars.connectedClients;
+}

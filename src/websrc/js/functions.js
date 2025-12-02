@@ -51,7 +51,8 @@ const commands = {
 	CMD_ZB_LED_TOG: 12,
 	CMD_ESP_FAC_RES: 13,
 	CMD_ZB_ERASE_NVRAM: 14,
-	CMD_DNS_CHECK: 15
+	CMD_DNS_CHECK: 15,
+	CMD_CLIENT_CHECK: 16
 }
 
 const api = {
@@ -739,6 +740,32 @@ function showCardDrawIcon(property, values) {
 		}
 		setIconGlow('vpnIcon', status);
 	}
+
+	if (property === "ccMode") {
+		const ccMode = getCcModeFromIndex(values[property]);
+		let text;
+
+		const configGeneratorWrapper = document.getElementById("configGeneratorWrapper");
+		const ccModeSwitchWrapper = document.getElementById("ccModeSwitchWrapper");
+		configGeneratorWrapper.classList.add("d-none");
+
+		switch (ccMode) {
+			case "coordinator":
+				text = i18next.t('md.zb.dtc');
+				configGeneratorWrapper.classList.remove("d-none");
+				break;
+			case "router":
+				text = i18next.t('md.zb.dtr');
+				break;
+			case "openthread":
+				text = i18next.t('md.zb.dtt');
+				break;
+			default:
+				text = "[ERROR] Unknown Mode";
+				break;
+		}
+		document.getElementById("ccMode").innerHTML = text;
+	}
 }
 
 function updateTooltips() {
@@ -1362,8 +1389,33 @@ function reconnectEvents() {
 	}
 }
 
-// Pre-flash Window with "Cancel" and "Im sure" buttons
+// Check if clients are connected and configure corresponding modal
+// modal gets created in HTML 
 function startZbFlash(link, fwMode) {
+	$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_CLIENT_CHECK, function (connectedClients) {
+		console.log("Connected Clients: " + connectedClients);
+		if(connectedClients != 0) {
+			configureClientErrorModal();
+		}
+		else {
+			configureZigBeeFlashModal(link, fwMode);
+		}
+	});
+}
+
+function configureClientErrorModal() {
+	$(modalBtns).html("");
+	$(modalBody).html("");
+	
+	$("<div>", {
+			text: i18next.t("md.zb.ccn"),
+			class: "my-1 text-sm-center text-danger"
+	}).appendTo(modalBody);
+
+	modalAddClose();
+}
+
+function configureZigBeeFlashModal(link, fwMode) {
 	$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_DNS_CHECK, function (data) {
 		reconnectEvents();
 
@@ -1513,16 +1565,19 @@ function findAllVersionsSorted(data, chip) {
 	return result;
 }
 
-// Function definition outside the switch-case
-// creates the Webinterface block on System -> Firmware -> Zigbee -> Show available...
-function createReleaseBlock(file, deviceType) {
-
+function getCcModeFromIndex(index) {
 	const deviceTypeToFwMap = {
 		1: "coordinator",
 		2: "router",
 		3: "thread"
 	};
-	deviceType = deviceTypeToFwMap[deviceType];
+	return deviceTypeToFwMap[index];
+}
+
+// Function definition outside the switch-case
+// creates the Webinterface block on System -> Firmware -> Zigbee -> Show available...
+function createReleaseBlock(file, deviceType) {
+	deviceType = getCcModeFromIndex(deviceType);
 
 	let deviceName;
 	let deviceIcon;
