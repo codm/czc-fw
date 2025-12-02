@@ -395,7 +395,8 @@
         "sel": "Konfiguration generieren für",
         "sopm": "Ausgangsleistung auf maximum 20 dBm einstellen",
         "ss": "Serielle Konfiguration",
-        "tt": "Konfigurationsgenerator"
+        "tt": "Konfigurationsgenerator",
+        "zrci": "Im Router Modus wird keine weitere Konfiguration benötigt."
       },
       "so": "Serielle Konfiguration",
       "sp": "Socket-Anschluss",

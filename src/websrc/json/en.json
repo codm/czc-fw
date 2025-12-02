@@ -163,7 +163,8 @@
         "sopm": "Set output power to max 20",
         "ha": "For Home Assistant: Go to \"Settings\"→\"System\"→\"Hardware\"→Select the 3 dot menu in the upper right corner→\"All Hardware\"→Scroll to ttyUSB and find your adapter→Copy Device path like \"/dev/ttyUSB0\"",
         "lin": "List of USB devices in Linux: ls  /dev/ttyUSB*",
-        "dp": "INSERT_DEVICE_PATH_HERE"
+        "dp": "INSERT_DEVICE_PATH_HERE",
+        "zrci": "No further configuration is required in router mode."
       },
       "fws": {
         "tt": "Device Role",
