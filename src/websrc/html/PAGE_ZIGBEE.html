@@ -199,7 +199,7 @@
                         const baudRate = fw[classToFwMap[matchedClass]][0].baud;
                         console.log(fileLink + " @ " + baudRate);
                         modalConstructor("flashZBM");
-                        startZbFlash(fileLink + "?b=" + baudRate, [matchedClass]);
+                        startZbFlash(fileLink + "?b=" + baudRate, matchedClass);
                     } else {
                         const errorMessage = classToErrorMessage[matchedClass] || "No matching firmware available.";
                         console.log(errorMessage);

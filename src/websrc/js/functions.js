@@ -51,7 +51,8 @@ const commands = {
 	CMD_ZB_LED_TOG: 12,
 	CMD_ESP_FAC_RES: 13,
 	CMD_ZB_ERASE_NVRAM: 14,
-	CMD_DNS_CHECK: 15
+	CMD_DNS_CHECK: 15,
+	CMD_CLIENT_CHECK: 16
 }
 
 const api = {
@@ -494,7 +495,7 @@ function apiGetPage(page, doneCall, loader = true) {
 					url: e.currentTarget.action,
 					data: data,
 					success: function () {
-						if(target == "network") {
+						if(target == "network" || target == "serialSettings") {
 							modalConstructor("saveOk");
 						}
 					},
@@ -1407,8 +1408,33 @@ function reconnectEvents() {
 	}
 }
 
-// Pre-flash Window with "Cancel" and "Im sure" buttons
+// Check if clients are connected and configure corresponding modal
+// modal gets created in HTML 
 function startZbFlash(link, fwMode) {
+	$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_CLIENT_CHECK, function (connectedClients) {
+		console.log("Connected Clients: " + connectedClients);
+		if(connectedClients != 0) {
+			configureClientErrorModal();
+		}
+		else {
+			configureZigBeeFlashModal(link, fwMode);
+		}
+	});
+}
+
+function configureClientErrorModal() {
+	$(modalBtns).html("");
+	$(modalBody).html("");
+	
+	$("<div>", {
+			text: i18next.t("md.zb.ccn"),
+			class: "my-1 text-sm-center text-danger"
+	}).appendTo(modalBody);
+
+	modalAddClose();
+}
+
+function configureZigBeeFlashModal(link, fwMode) {
 	$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_DNS_CHECK, function (data) {
 		reconnectEvents();
 
