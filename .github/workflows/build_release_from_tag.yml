@@ -107,35 +107,3 @@ jobs:
           files: |
             bin/czc_fw_${{ steps.get_tag.outputs.file_tag }}.ota.bin
             bin/czc_fw_${{ steps.get_tag.outputs.file_tag }}.full.bin
-
-      - name: Checkout releases branch
-        uses: actions/checkout@v3
-        with:
-          ref: releases
-          path: releases
-
-      - name: Copy files to releases directory
-        run: | 
-          TAG=${{ steps.get_tag.outputs.tag }}
-          CLEAN_TAG=${TAG:1} 
-
-          echo "Listing bin directory:"
-          ls -la ./bin
-
-          mkdir -p releases/$TAG
-          cp ./bin/czc_fw_$CLEAN_TAG.full.bin releases/$TAG/
-          cp manifest.json releases/$TAG/
-          echo "Files copied to releases directory."
-
-      - name: Commit and push files to releases branch
-        run: |
-          cd releases
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          if [[ -n $(git status --porcelain) ]]; then
-            git add .
-            git commit -m "Add firmware and manifest for version ${{ steps.get_tag.outputs.tag }}"
-            git push origin releases
-          else
-            echo "No changes to commit"
-          fi

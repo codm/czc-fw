@@ -1,6 +1,9 @@
 <div id='main'>
     <div class="row">
-        <div class="col-12 col-xl-8">
+        <div class="alert alert-warning d-none" id="routerConfigInformation" data-i18n="p.zi.cfg.zrci"></div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-xl-8 d-none" id="configGeneratorWrapper">
             <div class='card mb-4'>
                 <div class="card-header fw-bold">
                     <svg class="card_icon" fill="currentColor" viewBox="0 0 16 16">
@@ -46,8 +49,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-xl-4">
-            <form class="saveParams" method='POST' action="saveParams" data-target="serialSettings" style="margin-block-end: 0em;">
+        <div class="col-12 col-xl-4 d-none" id="serialConfigurationWrapper">
+            <form class="saveParams" method='POST' action="saveParams" style="margin-block-end: 0em;">
                 <div class='card mb-4'>
                     <div class="card-header fw-bold">
                         <svg class="card_icon" fill="currentColor" viewBox="0 0 16 16">
@@ -97,55 +100,55 @@
                 </div>
             </form>
         </div>
-    </div>
-    <div class="col-12 cardPadding">
-        <div class='card'>
-            <div class="card-header fw-bold">
-                <svg class="card_icon" fill="currentColor" viewBox="0 0 16 16">
-                    <use xlink:href="icons.svg#exclamation-triangle" />
-                </svg>
-                <span data-i18n="p.zi.fws.tt"></span>
-            </div>
-            <div class='card-body'>
-                <div class='col-sm-12'>
-                    <div class="alert alert-danger ap-alert" role="alert" data-i18n="p.zi.fws.alarm">
-                    </div>
-                    <div class="row justify-content-center my-4 zb_cards">
-                        <div class="col-4">
-                            <div class="card selectable-card zfs_coordinator">
-                                <div class="card-body text-center card-label">
-                                    <svg class="large-icon" fill="currentColor" viewBox="0 0 16 16">
-                                        <use xlink:href="icons.svg#zigbee" />
-                                    </svg>
-                                    <span>Coordinator</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="card selectable-card zfs_router">
-                                <div class="card-body text-center card-label">
-                                    <svg class="large-icon" fill="currentColor" viewBox="0 0 16 16">
-                                        <use xlink:href="icons.svg#zigbee" />
-                                    </svg>
-                                    <span>Router</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="card selectable-card zfs_thread">
-                                <div class="card-body text-center card-label">
-                                    <svg class="large-icon" fill="currentColor" viewBox="0 0 16 16">
-                                        <use xlink:href="icons.svg#thread" />
-                                    </svg>
-                                    <span>OpenThread</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="col-12 cardPadding" id="ccModeSwitchWrapper">
+            <div class='card'>
+                <div class="card-header fw-bold">
+                    <svg class="card_icon" fill="currentColor" viewBox="0 0 16 16">
+                        <use xlink:href="icons.svg#exclamation-triangle" />
+                    </svg>
+                    <span data-i18n="p.zi.fws.tt"></span>
                 </div>
-                <div class="col-12 d-flex justify-content-center">
-                    <button class="btn btn-outline-warning col-6" id="zbMode" onclick="getSelectedCard()" data-i18n="c.sure"
-                        disabled></button>
+                <div class='card-body'>
+                    <div class='col-sm-12'>
+                        <div class="alert alert-danger ap-alert" role="alert" data-i18n="p.zi.fws.alarm">
+                        </div>
+                        <div class="row justify-content-center my-4 zb_cards">
+                            <div class="col-4">
+                                <div class="card selectable-card zfs_coordinator">
+                                    <div class="card-body text-center card-label">
+                                        <svg class="large-icon" fill="currentColor" viewBox="0 0 16 16">
+                                            <use xlink:href="icons.svg#zigbee" />
+                                        </svg>
+                                        <span>Coordinator</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="card selectable-card zfs_router">
+                                    <div class="card-body text-center card-label">
+                                        <svg class="large-icon" fill="currentColor" viewBox="0 0 16 16">
+                                            <use xlink:href="icons.svg#zigbee" />
+                                        </svg>
+                                        <span>Router</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="card selectable-card zfs_thread">
+                                    <div class="card-body text-center card-label">
+                                        <svg class="large-icon" fill="currentColor" viewBox="0 0 16 16">
+                                            <use xlink:href="icons.svg#thread" />
+                                        </svg>
+                                        <span>OpenThread</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 d-flex justify-content-center">
+                        <button class="btn btn-outline-warning col-6" id="zbMode" onclick="getSelectedCard()" data-i18n="c.sure"
+                            disabled></button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -196,7 +199,7 @@
                         const baudRate = fw[classToFwMap[matchedClass]][0].baud;
                         console.log(fileLink + " @ " + baudRate);
                         modalConstructor("flashZBM");
-                        startZbFlash(fileLink + "?b=" + baudRate);
+                        startZbFlash(fileLink + "?b=" + baudRate, matchedClass);
                     } else {
                         const errorMessage = classToErrorMessage[matchedClass] || "No matching firmware available.";
                         console.log(errorMessage);

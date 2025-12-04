@@ -86,7 +86,9 @@
       "rfm": "Firmware-Informationen werden abgerufen...",
       "dtt": "OpenThread",
       "ntf": "Die Thread-Firmware fehlt.",
-      "cte": "Klicken Sie, um die Informationen zu erweitern"
+      "cte": "Klicken Sie, um die Informationen zu erweitern",
+      "ccn": "Updaten nicht möglich solange Clients (Zigbee2MQTT, Home Assistant, etc.) verbunden sind!"
+
     },
     "kw": {
       "msg": "Mit dieser Funktion können Sie einen der Kommunikationskanäle aktiv lassen und auf die Weboberfläche zugreifen. \nDas Gerät wählt selbst je nach Priorität einen verfügbaren Kanal aus: WIFI, ETHERNET, WIFI AP"
@@ -358,7 +360,8 @@
       "zu": "Zigbee-Update (in Entwicklung)",
       "saf": "Verfügbare Firmwares anzeigen",
       "zgu": "Git CC2652-Update",
-      "eznr": "NVRAM löschen"
+      "eznr": "NVRAM löschen",
+      "ulcc": "Unlearn ZigBee Router"
     },
     "vp": {
       "hn": {
@@ -394,7 +397,8 @@
         "sel": "Konfiguration generieren für",
         "sopm": "Ausgangsleistung auf maximum 20 dBm einstellen",
         "ss": "Serielle Konfiguration",
-        "tt": "Konfigurationsgenerator"
+        "tt": "Konfigurationsgenerator",
+        "zrci": "Im Router Modus wird keine weitere Konfiguration benötigt."
       },
       "so": "Serielle Konfiguration",
       "sp": "Socket-Anschluss",

@@ -51,7 +51,8 @@ const commands = {
 	CMD_ZB_LED_TOG: 12,
 	CMD_ESP_FAC_RES: 13,
 	CMD_ZB_ERASE_NVRAM: 14,
-	CMD_DNS_CHECK: 15
+	CMD_DNS_CHECK: 15,
+	CMD_CLIENT_CHECK: 16
 }
 
 const api = {
@@ -739,6 +740,51 @@ function showCardDrawIcon(property, values) {
 		}
 		setIconGlow('vpnIcon', status);
 	}
+
+	if (property === "ccMode") {
+		const ccMode = getCcModeFromIndex(values[property]);
+		let text;
+
+		const configGeneratorWrapper = document.getElementById("configGeneratorWrapper");
+		const serialConfigurationWrapper = document.getElementById("serialConfigurationWrapper");
+		const routerConfigInformation = document.getElementById("routerConfigInformation");
+		const ccModeSwitchWrapper = document.getElementById("ccModeSwitchWrapper");
+
+		if (configGeneratorWrapper) {
+			configGeneratorWrapper.classList.add("d-none");
+		}
+		if (serialConfigurationWrapper) {
+			serialConfigurationWrapper.classList.add("d-none");
+		}
+		if (routerConfigInformation) {
+			routerConfigInformation.classList.add("d-none");
+		}
+
+		switch (ccMode) {
+			case "coordinator":
+				text = i18next.t('md.zb.dtc');
+				if (configGeneratorWrapper) {
+					configGeneratorWrapper.classList.remove("d-none");
+				}
+				if (serialConfigurationWrapper) {
+					serialConfigurationWrapper.classList.remove("d-none");
+				}
+				break;
+			case "router":
+				text = i18next.t('md.zb.dtr');
+				if (routerConfigInformation) {
+					routerConfigInformation.classList.remove("d-none");
+				}
+				break;
+			case "openthread":
+				text = i18next.t('md.zb.dtt');
+				break;
+			default:
+				text = "[ERROR] Unknown Mode";
+				break;
+		}
+		document.getElementById("ccMode").innerHTML = text;
+	}
 }
 
 function updateTooltips() {
@@ -1362,7 +1408,33 @@ function reconnectEvents() {
 	}
 }
 
-function startZbFlash(link) {
+// Check if clients are connected and configure corresponding modal
+// modal gets created in HTML 
+function startZbFlash(link, fwMode) {
+	$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_CLIENT_CHECK, function (connectedClients) {
+		console.log("Connected Clients: " + connectedClients);
+		if(connectedClients != 0) {
+			configureClientErrorModal();
+		}
+		else {
+			configureZigBeeFlashModal(link, fwMode);
+		}
+	});
+}
+
+function configureClientErrorModal() {
+	$(modalBtns).html("");
+	$(modalBody).html("");
+	
+	$("<div>", {
+			text: i18next.t("md.zb.ccn"),
+			class: "my-1 text-sm-center text-danger"
+	}).appendTo(modalBody);
+
+	modalAddClose();
+}
+
+function configureZigBeeFlashModal(link, fwMode) {
 	$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_DNS_CHECK, function (data) {
 		reconnectEvents();
 
@@ -1388,7 +1460,7 @@ function startZbFlash(link) {
 			title: i18next.t("md.esp.fu.wm"),
 			disabled: true,
 			click: function () {
-				$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_ZB_FLASH + "&url=" + link);
+				$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_ZB_FLASH + "&url=" + link + "&fwMode=" + fwMode);
 				$(modalBtns).html("");
 				modalAddSpiner();
 				$(modalBody).html("");
@@ -1512,22 +1584,33 @@ function findAllVersionsSorted(data, chip) {
 	return result;
 }
 
+function getCcModeFromIndex(index) {
+	const deviceTypeToFwMap = {
+		1: "coordinator",
+		2: "router",
+		3: "thread"
+	};
+	return deviceTypeToFwMap[index];
+}
+
 // Function definition outside the switch-case
+// creates the Webinterface block on System -> Firmware -> Zigbee -> Show available...
 function createReleaseBlock(file, deviceType) {
+	deviceType = getCcModeFromIndex(deviceType);
 
 	let deviceName;
 	let deviceIcon;
 	let buttonClass;
 
-	if (deviceType == 1) {
+	if (deviceType == "coordinator") {
 		deviceName = i18next.t('md.zb.dtc');
 		buttonClass = "btn btn-outline-danger";
 		deviceIcon = "📡";
-	} else if (deviceType == 2) {
+	} else if (deviceType == "router") {
 		deviceName = i18next.t('md.zb.dtr');
 		buttonClass = "btn btn-outline-success";
 		deviceIcon = "🛰️";
-	} else if (deviceType == 3) {
+	} else if (deviceType == "thread") {
 		deviceName = i18next.t('md.zb.dtt');
 		buttonClass = "btn btn-outline-primary";
 		deviceIcon = "🚀";
@@ -1548,7 +1631,7 @@ function createReleaseBlock(file, deviceType) {
 	const button = $('<a>', {
 		"class": buttonClass,
 		"click": function () {
-			startZbFlash(file.link + "?b=" + file.baud);
+			startZbFlash(file.link + "?b=" + file.baud, deviceType);
 			let tooltipInstance = bootstrap.Tooltip.getInstance(this);
 			if (tooltipInstance) {
 				tooltipInstance.hide();

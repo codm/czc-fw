@@ -30,7 +30,7 @@ void handleSaveParams();
 
 String getRootData(bool update = false);
 
-void sendEvent(const char *event, const uint8_t evsz, const String data);
+void sendEvent(const char *event, const String data);
 void progressFunc(unsigned int progress, unsigned int total);
 
 void getEspUpdate(String esp_fw_url);
@@ -40,6 +40,8 @@ String fetchLatestZbFw();
 String extractVersionFromURL(String url);
 
 void updateWebTask(void *parameter);
+
+void changeZbMode(String fwMode);
 
 enum API_PAGE_t : uint8_t
 {

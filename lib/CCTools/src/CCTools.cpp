@@ -712,8 +712,10 @@ void CCTools::restart()
     bslActive = 0;
 }
 
+// unlearn CC in router mode with the DIO 15 / BSL Pin
 void CCTools::routerRejoin()
 {
+    DEBUG_PRINTLN("[CCTOOLS] Simulating button press on BSL Pin | CC-Router-Mode reset");
     digitalWrite(_CC_BSL_PIN, LOW);
     // DEBUG_PRINTLN(F("ZB BSL pin ON"));
     delay(250);

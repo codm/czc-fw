@@ -37,6 +37,9 @@ extern CCTools CCTool;
 
 bool zbFwCheck()
 {
+    // As long as the ROUTER Version doesn't work with this check this manual override will guarantee a return true in non COORDINATOR mode
+    if(systemCfg.zbRole != COORDINATOR) return true;
+
     const int maxAttempts = 3;
     for (int attempt = 0; attempt < maxAttempts; attempt++)
     {
@@ -115,14 +118,12 @@ bool zigbeeErase()
 }
 void nvPrgs(const String &inputMsg)
 {
-
-    const uint8_t eventLen = 30;
     String msg = inputMsg;
     if (msg.length() > 25)
     {
         msg = msg.substring(0, 25);
     }
-    sendEvent(tagZB_NV_prgs, eventLen, msg);
+    sendEvent(tagZB_NV_prgs, msg);
     LOGD("%s", msg.c_str());
 }
 
@@ -137,25 +138,32 @@ void zbEraseNV(void *pvParameters)
 }
 
 bool flashZigbeefromURL(const char *url, const char *zigbee_firmware_path, CCTools &CCTool) {
-    const uint8_t eventLen = 11;
+    bool update_successful = false;
+
+    ledControl.modeLED.mode = LED_BLINK_3Hz;
+    vars.zbFlashing = true;
 
     // Remove first if the previous firmware download had an error and the file was not deleted
     removeFileFromFS(zigbee_firmware_path);
     zigbee_firmware_path = downloadFirmwareFromGithub(url);
     if(zigbee_firmware_path != nullptr) {
-        eraseWriteZbFile(zigbee_firmware_path,CCTool);
-        removeFileFromFS(zigbee_firmware_path);
+        update_successful = eraseWriteZbFile(zigbee_firmware_path,CCTool) && removeFileFromFS(zigbee_firmware_path);  
+        if(!update_successful) {
+            DEBUG_PRINTLN("[FLASH] Error while flashing or erasing file -> function returned false");
+        }
     }
     else {
-        sendEvent(tagZB_FW_err, eventLen, String("Failed!"));
-        return false;
+        sendEvent(tagZB_FW_err, String("Failed!"));
+        DEBUG_PRINTLN("[HTTP] download returned file nullptr");
     }
-    return true;
+
+    ledControl.modeLED.mode = LED_OFF;
+    vars.zbFlashing = false;
+    return update_successful;
 }
 
 const char* downloadFirmwareFromGithub(const char *url) {
-    const uint8_t eventLen = 11;
-    sendEvent(tagZB_FW_info, eventLen, String("startDownload"));
+    sendEvent(tagZB_FW_info, String("startDownload"));
 
     HTTPClient http;
     WiFiClientSecure secure_client;
@@ -169,10 +177,10 @@ const char* downloadFirmwareFromGithub(const char *url) {
     http.addHeader("Content-Type", "application/octet-stream");
     http.addHeader("Connection", "close");    
 
-    int http_responce_code = http.GET();
+    int http_response_code = http.GET();
     DEBUG_PRINT("[HTTP] GET code: ");
-    DEBUG_PRINTLN(http_responce_code);
-    if(http_responce_code == HTTP_CODE_OK) {
+    DEBUG_PRINTLN(http_response_code);
+    if(http_response_code == HTTP_CODE_OK) {
         int http_remaining_file_length = http.getSize();
         int http_total_file_length = http_remaining_file_length;
         DEBUG_PRINT("[HTTP] GET file length: ");
@@ -218,8 +226,6 @@ const char* downloadFirmwareFromGithub(const char *url) {
 
                 if(http_remaining_file_length > 0)
                     http_remaining_file_length -= http_payload_size;
-                DEBUG_PRINT("[DOWNLOAD] REMAINING FILE SIZE: ");
-                DEBUG_PRINTLN(http_remaining_file_length);
             }
 
             float percent = ((float)http_total_file_length - http_remaining_file_length) / http_total_file_length * 100.0f;  
@@ -232,7 +238,7 @@ const char* downloadFirmwareFromGithub(const char *url) {
     }
     else {
         DEBUG_PRINT("[HTTP] GET failed, error: ");
-        DEBUG_PRINTLN(http.errorToString(http_responce_code).c_str());
+        DEBUG_PRINTLN(http.errorToString(http_response_code).c_str());
     }
     http.end();
     return zigbee_firmware_path;
@@ -240,8 +246,7 @@ const char* downloadFirmwareFromGithub(const char *url) {
 
 bool eraseWriteZbFile(const char *filePath, CCTools &CCTool)
 {
-    const uint8_t eventLen = 11;
-    sendEvent(tagZB_FW_info, eventLen, String("startFlash"));
+    sendEvent(tagZB_FW_info, String("startFlash"));
     
     File file = LittleFS.open(filePath, "r");
     if (!file)
@@ -277,25 +282,23 @@ bool eraseWriteZbFile(const char *filePath, CCTools &CCTool)
         loadedSize += c;
         float percent = static_cast<float>(loadedSize) / totalSize * 100.0f;
         previousPercent = sendPercentageToFrontend(percent, previousPercent, tagZB_FW_prgs);
-        DEBUG_PRINT("[FLASH] in progess: ");
-        DEBUG_PRINTLN(percent);
         delay(1); // Yield to allow other processes
     }
     
     DEBUG_PRINTLN("[FLASH] Completed!");
     file.close();
 
-    sendEvent(tagZB_FW_info, eventLen, String("finishFlash"));
+    sendEvent(tagZB_FW_info, String("finishFlash"));
 
     CCTool.restart();
     return true;
 }
 
 float sendPercentageToFrontend(float percent, float previousPercent, const char* eventType) {
-    const uint8_t eventLen = 11;
-
     if ((percent - previousPercent) > 1 || percent < 0.1 || percent == 100) {
-        sendEvent(eventType, eventLen, String(percent));    
+        sendEvent(eventType, String(percent));  
+        DEBUG_PRINT("[DOWNLOAD/FLASH] in progress: ");
+        DEBUG_PRINTLN(percent);  
         return percent;
     }
     return previousPercent;
