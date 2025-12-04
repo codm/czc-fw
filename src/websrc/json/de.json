@@ -87,7 +87,7 @@
       "dtt": "OpenThread",
       "ntf": "Die Thread-Firmware fehlt.",
       "cte": "Klicken Sie, um die Informationen zu erweitern",
-      "ccn": "Updaten nicht möglich solange Clients (Home Assistant, etc.) verbunden sind!"
+      "ccn": "Updaten nicht möglich solange Clients (Zigbee2MQTT, Home Assistant, etc.) verbunden sind!"
 
     },
     "kw": {

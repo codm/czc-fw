@@ -417,7 +417,7 @@
       "ntf": "The Thread firmware is missing.",
       "dtt": "OpenThread",
       "cte": "Click to expand info",
-      "ccn": "You can't update while Clients (Home Assistant, etc.) are connected!"
+      "ccn": "You can't update while Clients (Zigbee2MQTT, Home Assistant, etc.) are connected!"
     },
     "ss": {
       "tt": "SETTINGS SAVED",
