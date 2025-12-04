@@ -177,10 +177,10 @@ const char* downloadFirmwareFromGithub(const char *url) {
     http.addHeader("Content-Type", "application/octet-stream");
     http.addHeader("Connection", "close");    
 
-    int http_responce_code = http.GET();
+    int http_response_code = http.GET();
     DEBUG_PRINT("[HTTP] GET code: ");
-    DEBUG_PRINTLN(http_responce_code);
-    if(http_responce_code == HTTP_CODE_OK) {
+    DEBUG_PRINTLN(http_response_code);
+    if(http_response_code == HTTP_CODE_OK) {
         int http_remaining_file_length = http.getSize();
         int http_total_file_length = http_remaining_file_length;
         DEBUG_PRINT("[HTTP] GET file length: ");
@@ -238,7 +238,7 @@ const char* downloadFirmwareFromGithub(const char *url) {
     }
     else {
         DEBUG_PRINT("[HTTP] GET failed, error: ");
-        DEBUG_PRINTLN(http.errorToString(http_responce_code).c_str());
+        DEBUG_PRINTLN(http.errorToString(http_response_code).c_str());
     }
     http.end();
     return zigbee_firmware_path;

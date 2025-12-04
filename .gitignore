@@ -13,3 +13,8 @@ todo*
 !platformio.ini
 **/__pycache__
 tools/.no_web_update*
+gzipped/
+*/tools/*
+min/
+node_modules
+package-lock.json 
