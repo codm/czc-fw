@@ -344,6 +344,8 @@ void saveSystemConfig(const SystemConfigStruct &config)
     preferences.putString(updCheckDayKey, config.updCheckDay);
     preferences.putBool(updAutoInstKey, config.updAutoInst);
 
+    preferences.putInt(zigBeeFwVersionKey, config.zigBeeFwVersion);
+
     preferences.end();
     setLedsDisable();
 }
@@ -382,6 +384,7 @@ void loadSystemConfig(SystemConfigStruct &config)
     strlcpy(config.updCheckTime, preferences.getString(updCheckTimeKey, UPD_CHK_TIME).c_str(), sizeof(config.updCheckTime));
     strlcpy(config.updCheckDay, preferences.getString(updCheckDayKey, UPD_CHK_DAY).c_str(), sizeof(config.updCheckDay));
     config.updAutoInst = preferences.getBool(updAutoInstKey, false);
+    config.zigBeeFwVersion = preferences.getInt(zigBeeFwVersionKey, false);
 
     preferences.end();
 }

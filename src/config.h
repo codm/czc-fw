@@ -238,6 +238,7 @@ struct SystemConfigStruct
   char updCheckTime[6];
   char updCheckDay[3];
   bool updAutoInst;
+  int zigBeeFwVersion;
 };
 
 // Function prototypes for SystemConfigStruct

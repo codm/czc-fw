@@ -80,6 +80,7 @@ const char *nmEnableKey = "nightMode";
 const char *updCheckTimeKey = "updHour";
 const char *updCheckDayKey = "updDays";
 const char *updAutoInstKey = "autoIns";
+const char *zigBeeFwVersionKey = "zigBeeFwVersion";
 
 const char *systemVarsKey = "system-vars";
 const char *hwBtnIsKey = "hwBtnIs";

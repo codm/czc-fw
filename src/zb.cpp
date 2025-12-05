@@ -159,6 +159,14 @@ bool flashZigbeefromURL(const char *url, const char *zigbee_firmware_path, CCToo
 
     ledControl.modeLED.mode = LED_OFF;
     vars.zbFlashing = false;
+
+    DEBUG_PRINTLN(url);
+
+    // https://raw.githubusercontent.com/xyzroe/XZG/zb_fws/ti/router/zr_genericapp_LP_CC1352P7_4_tirtos7_ticlang_20231201.bin?b=115200
+    int versionNumber = 187;
+    systemCfg.zigBeeFwVersion = versionNumber;
+    saveSystemConfig(systemCfg);
+
     return update_successful;
 }
 
