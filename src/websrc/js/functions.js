@@ -220,10 +220,10 @@ function generateConfig(params) {
 	let result;
 	const mist_cfg_txt = `baudrate: ${$("#baud").val()}
 # ${i18next.t('p.zi.cfg.dzl')}
-	disable_led: false
+  disable_led: false
 # ${i18next.t('p.zi.cfg.sopm')}
 advanced:
-	transmit_power: 20`;
+  transmit_power: 20`;
 	const ip = window.location.host;
 	const port = $("#port").val();
 	if (ip == "192.168.1.1") $(".ap-alert").removeClass(classHide);
@@ -235,9 +235,9 @@ advanced:
 			result = `# ${i18next.t('p.zi.cfg.ss')}
 serial:
 # ${i18next.t('p.zi.cfg.lxzg')}
-  	port: tcp://${ip}:${port}
-  	adapter: zstack
-  	${mist_cfg_txt}`;
+  port: tcp://${ip}:${port}
+  adapter: zstack
+  ${mist_cfg_txt}`;
 			break;
 		case "usb":
 			result = `# ${i18next.t('p.zi.cfg.ha')}
@@ -245,9 +245,9 @@ serial:
 # ${i18next.t('p.zi.cfg.ss')}
 serial:
 # ${i18next.t('p.zi.cfg.lxzg')}
-  	port: ${i18next.t('p.zi.cfg.dp')}
-  	adapter: zstack
-  	${mist_cfg_txt}`;
+  port: ${i18next.t('p.zi.cfg.dp')}
+  adapter: zstack
+  ${mist_cfg_txt}`;
 			break;
 
 		default:
