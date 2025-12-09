@@ -15,6 +15,7 @@
 #include "zb.h"
 #include "mqtt.h"
 #include "const/keys.h"
+#include <string.h>
 
 extern struct SysVarsStruct vars;
 extern struct HwConfigStruct hwConfig;
@@ -159,6 +160,18 @@ bool flashZigbeefromURL(const char *url, const char *zigbee_firmware_path, CCToo
 
     ledControl.modeLED.mode = LED_OFF;
     vars.zbFlashing = false;
+
+    DEBUG_PRINTLN(url);
+
+    // Example URL:
+    // https://raw.githubusercontent.com/xyzroe/XZG/zb_fws/ti/router/zr_genericapp_LP_CC1352P7_4_tirtos7_ticlang_20231201.bin?b=115200
+    char* binIndex = strstr(url, "bin");
+    int versionNumber = (int)strtol((binIndex - 9), NULL, 10);
+    systemCfg.zigBeeFwVersion = versionNumber;
+    saveSystemConfig(systemCfg);
+    DEBUG_PRINT("Saving Version number to systemconfig: ");
+    DEBUG_PRINTLN(versionNumber);
+
     return update_successful;
 }
 
