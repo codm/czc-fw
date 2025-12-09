@@ -1,6 +1,6 @@
 # Changelog
 
-## [V2.0.4] - 04-12-2025
+## [V2.0.4] - 09-12-2025
 - Fixed issue that prevented Router mode from being usable.
 - Added LED indicators to provide visual feedback during ZigBee updates.
 - Disallowed ZigBee chip updates while hosts are connected to avoid undefined states in host applications.
