@@ -76,6 +76,7 @@ extern const char *nmEnableKey;
 extern const char *updCheckTimeKey;
 extern const char *updCheckDayKey;
 extern const char *updAutoInstKey;
+extern const char *zigBeeFwVersionKey;
 extern const char *systemVarsKey;
 extern const char *hwBtnIsKey;
 extern const char *hwLedUsbIsKey;

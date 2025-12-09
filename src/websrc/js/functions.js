@@ -220,10 +220,10 @@ function generateConfig(params) {
 	let result;
 	const mist_cfg_txt = `baudrate: ${$("#baud").val()}
 # ${i18next.t('p.zi.cfg.dzl')}
-	disable_led: false
+  disable_led: false
 # ${i18next.t('p.zi.cfg.sopm')}
 advanced:
-	transmit_power: 20`;
+  transmit_power: 20`;
 	const ip = window.location.host;
 	const port = $("#port").val();
 	if (ip == "192.168.1.1") $(".ap-alert").removeClass(classHide);
@@ -1412,7 +1412,6 @@ function reconnectEvents() {
 // modal gets created in HTML 
 function startZbFlash(link, fwMode) {
 	$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_CLIENT_CHECK, function (connectedClients) {
-		console.log("Connected Clients: " + connectedClients);
 		if(connectedClients != 0) {
 			configureClientErrorModal();
 		}

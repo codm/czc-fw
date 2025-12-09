@@ -1701,10 +1701,12 @@ static inline void getRootHwMisc(DynamicJsonDocument &doc, bool update)
 
     doc["espFlashSize"] = ESP.getFlashChipSize() / (1024 * 1024);
 
-    // doc["zigbeeFwRev"] = String(CCTool.chip.fwRev);
-    if (CCTool.chip.fwRev > 0 || systemCfg.zbRole != COORDINATOR)
+    if (CCTool.chip.fwRev > 0)
     {
         doc["zigbeeFwRev"] = String(CCTool.chip.fwRev);
+    }
+    else if(systemCfg.zbRole != COORDINATOR) {
+        doc["zigbeeFwRev"] = String(systemCfg.zigBeeFwVersion);
     }
     else
     {
