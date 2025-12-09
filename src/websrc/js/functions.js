@@ -1412,7 +1412,6 @@ function reconnectEvents() {
 // modal gets created in HTML 
 function startZbFlash(link, fwMode) {
 	$.get(apiLink + api.actions.API_CMD + "&cmd=" + api.commands.CMD_CLIENT_CHECK, function (connectedClients) {
-		console.log("Connected Clients: " + connectedClients);
 		if(connectedClients != 0) {
 			configureClientErrorModal();
 		}
