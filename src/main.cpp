@@ -649,6 +649,10 @@ void setup()
       }
     }
   }
+  else if(systemCfg.zbRole == ROUTER) {
+    ledControl.powerLED.mode = LED_ON;
+    LOGI("[ZB] role: %s", String(systemCfg.zbRole));
+  }
   else
   {
     LOGI("[ZB] role: %s", String(systemCfg.zbRole));

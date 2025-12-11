@@ -82,6 +82,8 @@ bool wifiWebSetupInProgress = false;
 
 bool eventOK = false;
 
+SemaphoreHandle_t sendEventMutex;
+
 // API strings
 const char *argAction          = "action";
 const char *argPage            = "page";
@@ -299,6 +301,10 @@ void initWebServer()
 
     const char       *headerkeys[]   = {"Content-Length", "Cookie"};
     constexpr size_t  headerkeyssize = sizeof(headerkeys) / sizeof(char *);
+    sendEventMutex = xSemaphoreCreateMutex();
+    if(sendEventMutex == NULL) {
+        DEBUG_PRINTLN("Error while creating sendEventMutex!");
+    }
     serverWeb.collectHeaders(headerkeys, headerkeyssize);
     serverWeb.begin();
     LOGD("done");
@@ -443,6 +449,16 @@ void handleEvents()
             eventsClient.println ();
             eventsClient.flush   ();
         }
+    }
+}
+
+void sendEventSafe(const char *event, const String data) {
+    if(xSemaphoreTake(sendEventMutex, pdMS_TO_TICKS(250))) {
+        sendEvent(event, data);
+        xSemaphoreGive(sendEventMutex);
+    }
+    else {
+        DEBUG_PRINTLN("Could not send event because method was locked!");
     }
 }
 
@@ -634,7 +650,8 @@ void changeZbMode(String fwMode) {
     if (fwMode == "coordinator") {
         systemCfg.zbRole = COORDINATOR;
         DEBUG_PRINTLN("[WEB] Changed ZbRole to COORDINATOR");
-        
+        if(vars.connectedClients == 0) ledControl.powerLED.mode = LED_BLINK_1Hz;
+
         // Only here because the other FWs dont respond to FW checks
         DEBUG_PRINTLN("[WEB] Checking ZigBee firmware on the CC");
         String result = "";
@@ -643,6 +660,7 @@ void changeZbMode(String fwMode) {
     else if (fwMode == "router")
     {
         systemCfg.zbRole = ROUTER;
+        ledControl.powerLED.mode = LED_ON;
         DEBUG_PRINTLN("[WEB] Changed ZbRole to ROUTER");
     }
     else if (fwMode == "thread")
@@ -1055,9 +1073,9 @@ void printEachKeyValuePair(const String &jsonString)
         String output;
         serializeJson(pairDoc, output);
 
-        sendEvent("root_update", String(output));
+        sendEventSafe("root_update", String(output));
     }
-    sendEvent("root_update", String("finish"));
+    sendEventSafe("root_update", String("finish"));
 }
 
 void updateWebTask(void *parameter)
@@ -1897,7 +1915,7 @@ void progressFunc(unsigned int progress, unsigned int total)
 {
     float percent = ((float)progress / total) * 100.0;
 
-    sendEvent(tagESP_FW_prgs, String(percent));
+    sendEventSafe(tagESP_FW_prgs, String(percent));
     // printLogMsg(String(percent));
 
 #ifdef DEBUG
