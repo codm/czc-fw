@@ -30,6 +30,7 @@ void handleSaveParams();
 
 String getRootData(bool update = false);
 
+void sendEventSafe(const char *event, const String data);
 void sendEvent(const char *event, const String data);
 void progressFunc(unsigned int progress, unsigned int total);
 

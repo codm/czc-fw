@@ -1,5 +1,10 @@
 # Changelog
 
+## [V2.1.0] - 11-12-2025
+- Fixed project versioning: the last release should have been a minor update, not a patch.
+- The power LED now remains permanently on in router mode. 
+- Fixed a bug where incorrect information was displayed during CC update.
+
 ## [V2.0.4] - 09-12-2025
 - Fixed issue that prevented Router mode from being usable.
 - Added LED indicators to provide visual feedback during ZigBee updates.

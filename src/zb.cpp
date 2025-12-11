@@ -124,7 +124,7 @@ void nvPrgs(const String &inputMsg)
     {
         msg = msg.substring(0, 25);
     }
-    sendEvent(tagZB_NV_prgs, msg);
+    sendEventSafe(tagZB_NV_prgs, msg);
     LOGD("%s", msg.c_str());
 }
 
@@ -154,7 +154,7 @@ bool flashZigbeefromURL(const char *url, const char *zigbee_firmware_path, CCToo
         }
     }
     else {
-        sendEvent(tagZB_FW_err, String("Failed!"));
+        sendEventSafe(tagZB_FW_err, String("Failed!"));
         DEBUG_PRINTLN("[HTTP] download returned file nullptr");
     }
 
@@ -176,7 +176,7 @@ bool flashZigbeefromURL(const char *url, const char *zigbee_firmware_path, CCToo
 }
 
 const char* downloadFirmwareFromGithub(const char *url) {
-    sendEvent(tagZB_FW_info, String("startDownload"));
+    sendEventSafe(tagZB_FW_info, String("startDownload"));
 
     HTTPClient http;
     WiFiClientSecure secure_client;
@@ -259,7 +259,7 @@ const char* downloadFirmwareFromGithub(const char *url) {
 
 bool eraseWriteZbFile(const char *filePath, CCTools &CCTool)
 {
-    sendEvent(tagZB_FW_info, String("startFlash"));
+    sendEventSafe(tagZB_FW_info, String("startFlash"));
     
     File file = LittleFS.open(filePath, "r");
     if (!file)
@@ -301,7 +301,7 @@ bool eraseWriteZbFile(const char *filePath, CCTools &CCTool)
     DEBUG_PRINTLN("[FLASH] Completed!");
     file.close();
 
-    sendEvent(tagZB_FW_info, String("finishFlash"));
+    sendEventSafe(tagZB_FW_info, String("finishFlash"));
 
     CCTool.restart();
     return true;
@@ -309,7 +309,7 @@ bool eraseWriteZbFile(const char *filePath, CCTools &CCTool)
 
 float sendPercentageToFrontend(float percent, float previousPercent, const char* eventType) {
     if ((percent - previousPercent) > 1 || percent < 0.1 || percent == 100) {
-        sendEvent(eventType, String(percent));  
+        sendEventSafe(eventType, String(percent));  
         DEBUG_PRINT("[DOWNLOAD/FLASH] in progress: ");
         DEBUG_PRINTLN(percent);  
         return percent;
