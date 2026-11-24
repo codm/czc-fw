@@ -143,6 +143,8 @@ struct NetworkConfigStruct
   IPAddress ethGate;
   IPAddress ethDns1;
   IPAddress ethDns2;
+  // mDNS
+  bool mdnsEnable;
 };
 
 // Function prototypes for NetworkConfigStruct

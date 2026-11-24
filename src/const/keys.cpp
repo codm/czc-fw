@@ -21,6 +21,7 @@ const char *ethMaskKey = "ethMask";
 const char *ethGateKey = "ethGate";
 const char *ethDns1Key = "ethDns1";
 const char *ethDns2Key = "ethDns2";
+const char *mdnsEnblKey = "mdnsEnbl";
 
 const char *vpnConfigKey = "vpn-config";
 const char *wgEnableKey = "wgEnable";

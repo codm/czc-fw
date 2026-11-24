@@ -136,6 +136,8 @@ void saveNetworkConfig(const NetworkConfigStruct &config)
     preferences.putString(ethDns1Key, config.ethDns1.toString());
     preferences.putString(ethDns2Key, config.ethDns2.toString());
 
+    preferences.putBool(mdnsEnblKey, config.mdnsEnable);
+
     preferences.end();
 }
 
@@ -163,6 +165,8 @@ void loadNetworkConfig(NetworkConfigStruct &config)
     config.ethGate.fromString(preferences.getString(ethGateKey));
     config.ethDns1.fromString(preferences.getString(ethDns1Key, DNS_SERV_1));
     config.ethDns2.fromString(preferences.getString(ethDns2Key, DNS_SERV_2));
+
+    config.mdnsEnable = preferences.getBool(mdnsEnblKey, true);
 
     preferences.end();
 }
@@ -581,6 +585,8 @@ void updateConfiguration(WebServer &serverWeb, SystemConfigStruct &configSys, Ne
                     configNet.wifiDns2.fromString(serverWeb.arg(wifiDns2Key));
                 }
 
+                configNet.mdnsEnable = serverWeb.hasArg(mdnsEnblKey) == true;
+
                 saveNetworkConfig(configNet);
 
                 if (configNet.wifiEnable)
@@ -811,6 +817,7 @@ void serializeNetworkConfigToJson(const NetworkConfigStruct &config, JsonObject 
     obj[ethGateKey] = config.ethGate.toString();
     obj[ethDns1Key] = config.ethDns1.toString();
     obj[ethDns2Key] = config.ethDns2.toString();
+    obj[mdnsEnblKey] = config.mdnsEnable;
 }
 
 // Serialization VpnConfigStruct into JSON

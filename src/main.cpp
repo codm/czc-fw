@@ -131,7 +131,14 @@ void startServers(bool usb = false)
     }
   }*/
 
-  mDNS_start();
+  if (networkCfg.mdnsEnable)
+  {
+    mDNS_start();
+  }
+  else
+  {
+    LOGI("mDNS disabled by config");
+  }
   /* //not available now
   if (vpnCfg.hnEnable)
   {
