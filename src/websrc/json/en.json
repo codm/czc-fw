@@ -147,6 +147,18 @@
         "title": "Attention",
         "1": "We strongly advise against using Wi-Fi in ZigBee operation. Serial communication over Wi-Fi is not robust enough and does not contain any error correction mechanisms to compensate for fluctuating connections or packet loss. The same applies to WAN and VPN connections. See also:",
         "2": "When used as a Thread Border Router (currently under development), this problem does not occur."
+      },
+      "mdns": {
+        "tt": "mDNS (Multicast DNS)",
+        "info": "In some networks the ESP32 can have problems processing mDNS packets (e.g. with many mDNS devices or heavy multicast traffic). This can lead to recurring device reboots.",
+        "sol": "If you experience such problems, disabling mDNS may be a possible solution.",
+        "en": "Enable mDNS",
+        "cons": {
+          "tt": "Consequences of disabling mDNS:",
+          "1": "The device is no longer reachable via its hostname (e.g. hostname.local) -> access is only possible via its IP address.",
+          "2": "Automatic discovery (zeroconf) in Home Assistant / ZHA and other systems no longer works.",
+          "3": "Existing configurations in ioBroker, Home Assistant, Zigbee2MQTT etc. that use the hostname must be changed to the IP address. A static IP or a DHCP reservation is recommended."
+        }
       }
     },
     "zi": {

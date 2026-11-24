@@ -88,7 +88,6 @@
       "ntf": "Die Thread-Firmware fehlt.",
       "cte": "Klicken Sie, um die Informationen zu erweitern",
       "ccn": "Updaten nicht möglich solange Clients (Zigbee2MQTT, Home Assistant, etc.) verbunden sind!"
-
     },
     "kw": {
       "msg": "Mit dieser Funktion können Sie einen der Kommunikationskanäle aktiv lassen und auf die Weboberfläche zugreifen. \nDas Gerät wählt selbst je nach Priorität einen verfügbaren Kanal aus: WIFI, ETHERNET, WIFI AP"
@@ -254,6 +253,18 @@
         "title": "Achtung",
         "1": "Im ZigBee-Betrieb raten wir dringend von der WLAN-Nutzung ab. Die serielle Kommunikation über WLAN ist nicht robust genug und enthält keine Fehlerkorrekturmechanismen um schwankende Verbindungen oder Packetverluste ausgleichen zu können. Gleiches gilt für WAN- und VPN-Verbindungen. Siehe auch:",
         "2": "Bei der Nutzung als Thread Border Router (aktuell in Entwicklung) kommt dieses Problem nicht zum Tragen."
+      },
+      "mdns": {
+        "tt": "mDNS (Multicast DNS)",
+        "info": "In manchen Netzwerken kann der ESP32 Probleme bei der Verarbeitung von mDNS-Paketen haben (z. B. bei vielen mDNS-Geräten oder hohem Multicast-Aufkommen). Das kann zu wiederkehrenden Gerät-Neutsarts führen.",
+        "sol": "Wenn solche Probleme auftreten, kann das Deaktivieren von mDNS eine mögliche Lösung sein.",
+        "en": "mDNS aktivieren",
+        "cons": {
+          "tt": "Folgen der Deaktivierung von mDNS:",
+          "1": "Das Gerät ist nicht mehr über seinen Hostnamen (z. B. hostname.local) erreichbar -> der Zugriff ist nur noch über die IP-Adresse möglich.",
+          "2": "Die automatische Erkennung (Zeroconf) in Home Assistant / ZHA und anderen Systemen funktioniert nicht mehr.",
+          "3": "Bestehende Konfigurationen in ioBroker, Home Assistant, Zigbee2MQTT usw., die den Hostnamen verwenden, müssen auf die IP-Adresse umgestellt werden. Eine statische IP oder DHCP-Reservierung wird empfohlen."
+        }
       }
     },
     "st": {

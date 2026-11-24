@@ -22,6 +22,7 @@ extern const char *ethMaskKey;
 extern const char *ethGateKey;
 extern const char *ethDns1Key;
 extern const char *ethDns2Key;
+extern const char *mdnsEnblKey;
 extern const char *vpnConfigKey;
 extern const char *wgEnableKey;
 extern const char *wgLocalIPKey;

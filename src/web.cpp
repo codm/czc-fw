@@ -1354,6 +1354,11 @@ void handleNetwork()
             break;
     }
 
+    if (networkCfg.mdnsEnable)
+    {
+        doc[mdnsEnblKey] = checked;
+    }
+
     if (hwConfig.eth.mdcPin == -1 || hwConfig.eth.mdiPin == -1)
     {
         doc["no_eth"] = 1;
