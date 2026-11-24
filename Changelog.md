@@ -1,5 +1,8 @@
 # Changelog
 
+## [V2.1.2] - 24-11-2026
+- Add option to disable mdns (this could help with recurring device reboots).
+
 ## [V2.1.1] - 11-09-2026
 - Add restart Modal on Zigbee-Settings change.
 
